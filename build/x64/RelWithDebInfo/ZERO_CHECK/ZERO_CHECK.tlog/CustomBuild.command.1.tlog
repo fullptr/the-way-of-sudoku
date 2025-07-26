@@ -1,0 +1,10 @@
+^C:\DEV\THE-WAY-OF-SUDOKU\BUILD\CMAKEFILES\BE69E890E1A1BD683594DF389D818707\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/dev/the-way-of-sudoku -BC:/dev/the-way-of-sudoku/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/dev/the-way-of-sudoku/build/sandfall.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

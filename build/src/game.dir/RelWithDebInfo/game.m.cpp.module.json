@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "game.dir\\RelWithDebInfo\\game.m.obj",
+            "outputs": [
+                "C:\\dev\\the-way-of-sudoku\\build\\src\\game.dir\\RelWithDebInfo\\vc143.pdb",
+                "game.dir\\RelWithDebInfo\\"
+            ],
+            "requires": []
+        }
+    ]
+}

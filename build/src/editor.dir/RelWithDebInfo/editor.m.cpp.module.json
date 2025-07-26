@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "editor.dir\\RelWithDebInfo\\editor.m.obj",
+            "outputs": [
+                "C:\\dev\\the-way-of-sudoku\\build\\src\\editor.dir\\RelWithDebInfo\\vc143.pdb",
+                "editor.dir\\RelWithDebInfo\\"
+            ],
+            "requires": []
+        }
+    ]
+}
