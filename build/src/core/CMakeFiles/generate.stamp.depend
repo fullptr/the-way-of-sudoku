@@ -7,15 +7,7 @@ C:/Program Files/CMake/share/cmake-4.0/Modules/FindPackageHandleStandardArgs.cma
 C:/Program Files/CMake/share/cmake-4.0/Modules/FindPackageMessage.cmake
 C:/Program Files/CMake/share/cmake-4.0/Modules/FindThreads.cmake
 C:/Program Files/CMake/share/cmake-4.0/Modules/Internal/CheckSourceCompiles.cmake
-C:/Program Files/CMake/share/cmake-4.0/Modules/SelectLibraryConfigurations.cmake
 C:/dev/the-way-of-sudoku/src/core/CMakeLists.txt
-C:/dev/vcpkg/installed/x64-windows/share/box2d/box2dConfig-debug.cmake
-C:/dev/vcpkg/installed/x64-windows/share/box2d/box2dConfig-release.cmake
-C:/dev/vcpkg/installed/x64-windows/share/box2d/box2dConfig.cmake
-C:/dev/vcpkg/installed/x64-windows/share/box2d/box2dConfigVersion.cmake
-C:/dev/vcpkg/installed/x64-windows/share/cereal/cerealConfig.cmake
-C:/dev/vcpkg/installed/x64-windows/share/cereal/cerealConfigVersion.cmake
-C:/dev/vcpkg/installed/x64-windows/share/cereal/cerealTargets.cmake
 C:/dev/vcpkg/installed/x64-windows/share/glad/gladConfig.cmake
 C:/dev/vcpkg/installed/x64-windows/share/glad/gladConfigVersion.cmake
 C:/dev/vcpkg/installed/x64-windows/share/glad/gladTargets-debug.cmake
@@ -30,9 +22,3 @@ C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfig-debug.cmake
 C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfig-release.cmake
 C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfig.cmake
 C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfigVersion.cmake
-C:/dev/vcpkg/installed/x64-windows/share/imgui/imgui-config.cmake
-C:/dev/vcpkg/installed/x64-windows/share/imgui/imgui-targets-debug.cmake
-C:/dev/vcpkg/installed/x64-windows/share/imgui/imgui-targets-release.cmake
-C:/dev/vcpkg/installed/x64-windows/share/imgui/imgui-targets.cmake
-C:/dev/vcpkg/installed/x64-windows/share/stb/FindStb.cmake
-C:/dev/vcpkg/installed/x64-windows/share/stb/vcpkg-cmake-wrapper.cmake

@@ -3,10 +3,6 @@ cmake_minimum_required(VERSION 3.30)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(cereal CONFIG REQUIRED)
-find_package(box2d CONFIG REQUIRED)
-find_package(Stb REQUIRED)
 
 add_library(core STATIC
     buffer.cpp
@@ -19,13 +15,10 @@ add_library(core STATIC
     ui.cpp
 )
 
-target_include_directories(core PUBLIC . ${Stb_INCLUDE_DIR})
+target_include_directories(core PUBLIC .)
 
 target_link_libraries(core PRIVATE
     glfw
     glad::glad
     glm::glm
-    imgui::imgui
-    cereal::cereal
-    box2d::box2d
 )
