@@ -10,20 +10,13 @@ find_package(Stb REQUIRED)
 
 add_library(core STATIC
     buffer.cpp
-    renderer.cpp
     shape_renderer.cpp
     debug.cpp
     window.cpp
-    entity.cpp
     shader.cpp
     texture.cpp
     utility.cpp
     input.cpp
-    world.cpp
-    pixel.cpp
-    explosion.cpp
-    update_rigid_bodies.cpp
-    serialisation.cpp
     ui.cpp
 )
 

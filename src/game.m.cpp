@@ -1,15 +1,12 @@
 #include "common.hpp"
-#include "world.hpp"
 #include "input.hpp"
 #include "window.hpp"
-#include "camera.hpp"
-#include "serialisation.hpp"
 #include "utility.hpp"
-#include "renderer.hpp"
 #include "debug.hpp"
 #include "shape_renderer.hpp"
 #include "ui.hpp"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
 

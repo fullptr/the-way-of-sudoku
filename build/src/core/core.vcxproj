@@ -290,20 +290,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\buffer.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\renderer.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\shape_renderer.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\debug.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\window.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\entity.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\shader.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\texture.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\utility.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\input.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\world.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\pixel.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\explosion.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\update_rigid_bodies.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\serialisation.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\ui.cpp" />
   </ItemGroup>
   <ItemGroup />

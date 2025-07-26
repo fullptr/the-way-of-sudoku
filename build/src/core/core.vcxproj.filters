@@ -4,9 +4,6 @@
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\shape_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -14,9 +11,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\entity.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\shader.cpp">
@@ -29,21 +23,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\world.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\pixel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\explosion.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\update_rigid_bodies.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\serialisation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\ui.cpp">
