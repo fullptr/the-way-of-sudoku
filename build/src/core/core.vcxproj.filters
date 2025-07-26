@@ -7,9 +7,6 @@
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\shape_renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\debug.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

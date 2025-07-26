@@ -11,7 +11,6 @@ find_package(Stb REQUIRED)
 add_library(core STATIC
     buffer.cpp
     shape_renderer.cpp
-    debug.cpp
     window.cpp
     shader.cpp
     texture.cpp

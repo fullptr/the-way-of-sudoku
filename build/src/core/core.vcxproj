@@ -291,7 +291,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\buffer.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\shape_renderer.cpp" />
-    <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\debug.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\window.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\shader.cpp" />
     <ClCompile Include="C:\dev\the-way-of-sudoku\src\core\texture.cpp" />

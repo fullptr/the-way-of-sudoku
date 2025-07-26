@@ -2,7 +2,6 @@
 #include "input.hpp"
 #include "window.hpp"
 #include "utility.hpp"
-#include "debug.hpp"
 #include "shape_renderer.hpp"
 #include "ui.hpp"
 

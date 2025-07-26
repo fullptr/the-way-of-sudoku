@@ -1,6 +1,5 @@
 C:\dev\the-way-of-sudoku\src\core\buffer.cpp;C:\dev\the-way-of-sudoku\build\src\core\core.dir\RelWithDebInfo\buffer.obj
 C:\dev\the-way-of-sudoku\src\core\shape_renderer.cpp;C:\dev\the-way-of-sudoku\build\src\core\core.dir\RelWithDebInfo\shape_renderer.obj
-C:\dev\the-way-of-sudoku\src\core\debug.cpp;C:\dev\the-way-of-sudoku\build\src\core\core.dir\RelWithDebInfo\debug.obj
 C:\dev\the-way-of-sudoku\src\core\window.cpp;C:\dev\the-way-of-sudoku\build\src\core\core.dir\RelWithDebInfo\window.obj
 C:\dev\the-way-of-sudoku\src\core\shader.cpp;C:\dev\the-way-of-sudoku\build\src\core\core.dir\RelWithDebInfo\shader.obj
 C:\dev\the-way-of-sudoku\src\core\texture.cpp;C:\dev\the-way-of-sudoku\build\src\core\core.dir\RelWithDebInfo\texture.obj
