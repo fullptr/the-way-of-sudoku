@@ -15,6 +15,7 @@
 enum class next_state
 {
     main_menu,
+    game,
     exit,
 };
 
@@ -41,6 +42,7 @@ auto scene_main_menu(sand::window& window) -> next_state
 
         if (ui.button("Start Game", {button_left, 100}, button_width, button_height, scale)) {
             std::print("starting game!\n");
+            return next_state::game;
         }
 
         if (ui.button("Exit", {button_left, 160}, button_width, button_height, scale)) {
@@ -77,6 +79,37 @@ auto scene_main_menu(sand::window& window) -> next_state
     return next_state::exit;
 }
 
+auto scene_game(sand::window& window) -> next_state
+{
+    using namespace sand;
+    auto timer = sand::timer{};
+    auto ui    = sand::ui_engine{};
+
+    while (window.is_running()) {
+        const double dt = timer.on_update();
+        window.begin_frame(clear_colour);
+
+        for (const auto event : window.events()) {
+            ui.on_event(event);
+        }
+        
+        const auto scale = 3.0f;
+        const auto button_width = 200;
+        const auto button_height = 50;
+        const auto button_left = (window.width() - button_width) / 2;
+
+        if (ui.button("Back", {button_left, 160}, button_width, button_height, scale)) {
+            std::print("exiting!\n");
+            return next_state::main_menu;
+        }
+
+        ui.draw_frame(window.width(), window.height(), dt);
+        window.end_frame();
+    }
+
+    return next_state::exit;
+}
+
 auto main() -> int
 {
     using namespace sand;
@@ -88,6 +121,9 @@ auto main() -> int
         switch (next) {
             case next_state::main_menu: {
                 next = scene_main_menu(window);
+            } break;
+            case next_state::game: {
+                next = scene_game(window);
             } break;
             case next_state::exit: {
                 std::print("closing game\n");
