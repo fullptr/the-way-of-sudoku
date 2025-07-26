@@ -1,6 +1,0 @@
-# CMake generation dependency list for this directory.
-C:/dev/the-way-of-sudoku/src/CMakeLists.txt
-C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfig-debug.cmake
-C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfig-release.cmake
-C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfig.cmake
-C:/dev/vcpkg/installed/x64-windows/share/glm/glmConfigVersion.cmake

@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/dev/the-way-of-sudoku/build/cmake_install.cmake",
-		"C:/dev/the-way-of-sudoku/build/src/cmake_install.cmake",
-		"C:/dev/the-way-of-sudoku/build/src/core/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
