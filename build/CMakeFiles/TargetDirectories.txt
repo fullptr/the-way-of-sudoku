@@ -1,5 +1,4 @@
 C:/dev/the-way-of-sudoku/build/CMakeFiles/ALL_BUILD.dir
 C:/dev/the-way-of-sudoku/build/CMakeFiles/ZERO_CHECK.dir
 C:/dev/the-way-of-sudoku/build/src/CMakeFiles/game.dir
-C:/dev/the-way-of-sudoku/build/src/CMakeFiles/editor.dir
 C:/dev/the-way-of-sudoku/build/src/core/CMakeFiles/core.dir

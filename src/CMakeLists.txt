@@ -17,17 +17,3 @@ target_link_libraries(game PRIVATE
     core
     glm::glm
 )
-
-add_executable(editor editor.m.cpp)
-
-target_include_directories(editor PUBLIC .)
-
-target_link_libraries(editor PRIVATE
-    core
-    glfw
-    glad::glad
-    glm::glm
-    imgui::imgui
-    cereal::cereal
-    box2d::box2d
-)
