@@ -48,10 +48,7 @@ in vec4  o_line_begin_colour;
 in vec4  o_line_end_colour;
 in float o_line_thickness;
 
-uniform int u_camera_width;
 uniform int u_camera_height;
-uniform vec2 u_camera_top_left;
-uniform float u_camera_world_to_screen;
 
 float cross2d(vec2 a, vec2 b)
 {
@@ -60,15 +57,12 @@ float cross2d(vec2 a, vec2 b)
 
 void main()
 {   
-    vec2 frag_coord = vec2(gl_FragCoord.x, u_camera_height - gl_FragCoord.y);
-
-    float thickness = o_line_thickness / u_camera_world_to_screen;
-    vec2 pixel = frag_coord / u_camera_world_to_screen + u_camera_top_left;
+    vec2 pixel = vec2(gl_FragCoord.x, u_camera_height - gl_FragCoord.y);
 
     vec2 line_begin = o_line_begin;
     vec2 line_end = o_line_end;
 
-    if (line_begin == line_end && distance(pixel, line_begin) < thickness) {
+    if (line_begin == line_end && distance(pixel, line_begin) < o_line_thickness) {
         out_colour = o_line_begin_colour;
         return;
     }
@@ -81,12 +75,12 @@ void main()
 
     float ratio_along = dot(A, B) / (lengthA * lengthA);
 
-    if (distance_from_line <= thickness) {
+    if (distance_from_line <= o_line_thickness) {
         if (ratio_along > 0 && ratio_along < 1) {
             out_colour = mix(o_line_begin_colour, o_line_end_colour, ratio_along);
-        } else if (ratio_along <= 0 && distance(line_begin, pixel) < thickness) {
+        } else if (ratio_along <= 0 && distance(line_begin, pixel) < o_line_thickness) {
             out_colour = o_line_begin_colour;
-        } else if (ratio_along >= 1 && distance(line_end, pixel) < thickness) {
+        } else if (ratio_along >= 1 && distance(line_end, pixel) < o_line_thickness) {
             out_colour = o_line_end_colour;
         } else {
             out_colour = vec4(0.0);
@@ -117,12 +111,12 @@ void main()
 {
     gl_Position = vec4(position, 0.0, 1.0);
     
-    o_circle_centre = circle_centre;
+    o_circle_centre       = circle_centre;
     o_circle_inner_radius = circle_inner_radius;
     o_circle_outer_radius = circle_outer_radius;
     o_circle_begin_colour = circle_begin_colour;
-    o_circle_end_colour = circle_end_colour;
-    o_circle_angle = circle_angle;
+    o_circle_end_colour   = circle_end_colour;
+    o_circle_angle        = circle_angle;
 } 
 )SHADER";
 
@@ -137,10 +131,7 @@ in vec4  o_circle_begin_colour;
 in vec4  o_circle_end_colour;
 in float o_circle_angle;
 
-uniform int u_camera_width;
 uniform int u_camera_height;
-uniform vec2 u_camera_top_left;
-uniform float u_camera_world_to_screen;
 
 const float pi = 3.1415926535897932384626433832795;
 
@@ -172,7 +163,7 @@ float rotation_value(vec2 v)
 void main()
 {   
     vec2 frag_coord = vec2(gl_FragCoord.x, u_camera_height - gl_FragCoord.y);
-    vec2 pixel = frag_coord / u_camera_world_to_screen + u_camera_top_left;
+    vec2 pixel = frag_coord;
 
     vec2 to_pixel = pixel - o_circle_centre;
     float from_centre = length(to_pixel);
@@ -321,16 +312,10 @@ void shape_renderer::begin_frame(const camera& c)
     d_quads.clear();
 
     d_line_shader.bind();
-    d_line_shader.load_int("u_camera_width", c.screen_width);
     d_line_shader.load_int("u_camera_height", c.screen_height);
-    d_line_shader.load_vec2("u_camera_top_left", glm::vec2{0, 0});
-    d_line_shader.load_float("u_camera_world_to_screen", 1);
 
     d_circle_shader.bind();
-    d_circle_shader.load_int("u_camera_width", c.screen_width);
     d_circle_shader.load_int("u_camera_height", c.screen_height);
-    d_circle_shader.load_vec2("u_camera_top_left", glm::vec2{0, 0});
-    d_circle_shader.load_float("u_camera_world_to_screen", 1);
 
     const auto dimensions = glm::vec2{c.screen_width, c.screen_height};
     const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
