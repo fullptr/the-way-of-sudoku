@@ -48,12 +48,12 @@ public:
     auto end_frame() -> void;
     auto events() -> std::span<const event>;
 
+    auto mouse_pos() const -> glm::ivec2;
+
     auto is_running() const -> bool;
 
     auto width() const -> int;
     auto height() const -> int;
-
-    auto enable_vsync(bool enable) const -> void;
 
     auto native_handle() -> GLFWwindow*;
 };

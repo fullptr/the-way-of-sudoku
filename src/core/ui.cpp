@@ -349,9 +349,9 @@ bool ui_engine::button(
 {
     const auto& data = get_data(key, pos, width, height);
     
-    constexpr auto unhovered_colour = from_hex(0x341f97);
-    constexpr auto hovered_colour = from_hex(0x5f27cd);
-    constexpr auto clicked_colour = from_hex(0x48dbfb);
+    constexpr auto unhovered_colour = from_hex(0x2c3e50);
+    constexpr auto hovered_colour = from_hex(0x34495e);
+    constexpr auto clicked_colour = from_hex(0xbdc3c7);
 
     const auto lerp_time = 0.1;
     
@@ -372,10 +372,11 @@ bool ui_engine::button(
     d_quads.emplace_back(quad);
 
     if (!msg.empty()) {
+        constexpr auto colour_fixed = from_hex(0xecf0f1);
         auto text_pos = pos;
         text_pos.x += (width - d_atlas.length_of(msg) * scale) / 2;
         text_pos.y += (height + d_atlas.height * scale) / 2;
-        text(msg, text_pos, scale);
+        text(msg, text_pos, scale, colour_fixed);
     }
     return data.clicked_this_frame;
 }
@@ -383,8 +384,8 @@ bool ui_engine::button(
 void ui_engine::box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key) {
     const auto& data = get_data(key, pos, width, height);
     
-    constexpr auto unhovered_colour = from_hex(0x341f97);
-    constexpr auto hovered_colour = from_hex(0x5f27cd);
+    constexpr auto unhovered_colour = from_hex(0x2c3e50);
+    constexpr auto hovered_colour = from_hex(0x34495e);
     
     auto colour = unhovered_colour;
     if (data.is_hovered()) {
@@ -402,9 +403,8 @@ void ui_engine::box_centred(glm::ivec2 centre, i32 width, i32 height, const widg
     box(top_left, width, height, key);
 }
 
-void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size)
+void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour)
 {
-    constexpr auto colour = from_hex(0xff9ff3);
     for (char c : message) {
         const auto ch = d_atlas.get_character(c);
 
@@ -423,12 +423,30 @@ void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size)
     }
 }
 
-void ui_engine::text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale)
+void ui_engine::text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
 {
     auto text_pos = pos;
     text_pos.x += (width - d_atlas.length_of(message) * scale) / 2;
     text_pos.y += (height + d_atlas.height * scale) / 2;
-    text(message, text_pos, scale);
+    text(message, text_pos, scale, colour);
+}
+
+void ui_engine::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height)
+{
+    constexpr auto colour_fixed = from_hex(0xecf0f1);
+    constexpr auto colour_added = from_hex(0x1abc9c);
+
+    auto cell_centre = pos;
+    cell_centre.x += width / 2;
+    cell_centre.y += height / 2;
+    box_centred(cell_centre, width, height, {static_cast<u64>(10 * coord.x + coord.y)});
+    if (cell.value.has_value()) {
+        if (cell.fixed) {
+            text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_fixed);
+        } else {
+            text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_added);
+        }
+    }
 }
 
 }

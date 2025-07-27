@@ -101,7 +101,7 @@ auto get_executable_filepath() -> std::filesystem::path
 
 auto mouse_pos_world_space(const input& in, const sudoku::camera& c) -> glm::vec2
 {
-    return in.position() / c.world_to_screen + c.top_left;
+    return in.position();
 }
 
 auto pixel_at_mouse(const input& in, const sudoku::camera& c) -> pixel_pos

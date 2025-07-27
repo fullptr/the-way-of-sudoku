@@ -36,7 +36,7 @@ window::window(const char* name, int width, int height)
 
     glfwMakeContextCurrent(native_window);
     glfwSetWindowUserPointer(native_window, &d_data);
-    enable_vsync(false);
+    glfwSwapInterval(1);
 
     // Initialise GLAD
     if (0 == gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -164,6 +164,13 @@ auto window::events() -> std::span<const event>
     return d_data.events;
 }
 
+auto window::mouse_pos() const -> glm::ivec2
+{
+    double x, y;
+    glfwGetCursorPos(d_data.native_window, &x, &y);
+    return {static_cast<i32>(x), static_cast<i32>(y)};
+}
+
 bool window::is_running() const
 {
     return d_data.running;
@@ -172,11 +179,6 @@ bool window::is_running() const
 auto window::width() const -> int
 {
     return d_data.width; 
-}
-
-auto window::enable_vsync(bool enable) const -> void
-{
-    glfwSwapInterval(enable ? 1 : 0);
 }
 
 auto window::height() const -> int

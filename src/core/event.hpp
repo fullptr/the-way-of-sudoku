@@ -24,6 +24,8 @@ enum class keyboard
 	left      = 263,
 	down      = 264,
 	up        = 265,
+
+	num_0 = 48, num_1, num_2, num_3, num_4, num_5, num_6, num_7, num_8, num_9,
 };
 
 // KEYBOARD EVENTS 
