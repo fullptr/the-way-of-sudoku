@@ -12,6 +12,10 @@
 
 #include <format>
 #include <print>
+#include <initializer_list>
+#include <string>
+#include <optional>
+#include <unordered_map>
 
 struct sudoku_cell
 {
@@ -23,6 +27,21 @@ struct sudoku_board
 {
     std::unordered_map<glm::ivec2, sudoku_cell> cells;
 };
+
+auto make_board(std::vector<std::string_view> cells) -> sudoku_board
+{
+    auto board = sudoku_board{};
+    for (int y = 0; y != cells.size(); ++y) {
+        const auto& row = cells[y];
+        for (int x = 0; x != row.size(); ++x) {
+            if (row[x] != '.') {
+                board.cells[{x, y}].value = static_cast<int>(row[x] - '0');
+                board.cells[{x, y}].fixed = true;
+            }
+        }
+    }
+    return board;
+}
 
 enum class next_state
 {
@@ -97,25 +116,17 @@ auto scene_game(sand::window& window) -> next_state
     auto timer = sand::timer{};
     auto ui    = sand::ui_engine{};
 
-    auto board = sudoku_board{};
-    for (int x = 0; x != 9; ++x) {
-        for (int y = 0; y != 9; ++y) {
-            board.cells[{x, y}] = sudoku_cell{ .value={}, .fixed=false};
-        }
-    }
-#define ADD_CELL(x, y, val) board.cells[{(x), (y)}] = sudoku_cell{ .value={(val)}, .fixed=true};
-    ADD_CELL(0, 0, 2);
-    ADD_CELL(3, 0, 9);
-    ADD_CELL(4, 0, 1);
-    ADD_CELL(6, 0, 5);
-    ADD_CELL(7, 0, 6);
-    ADD_CELL(8, 0, 8);
-    ADD_CELL(3, 1, 2);
-    ADD_CELL(4, 1, 5);
-    ADD_CELL(5, 1, 4);
-    ADD_CELL(6, 1, 1);
-    ADD_CELL(0, 2, 1);
-#undef ADD_CELL;
+    auto board = make_board({
+        "2..91.568",
+        "...2541..",
+        "1.....3..",
+        "3....96..",
+        "958.62..4",
+        ".74.38.1.",
+        ".81.4..26",
+        "...7..8..",
+        "..6891..3"
+    });
 
     while (window.is_running()) {
         const double dt = timer.on_update();
