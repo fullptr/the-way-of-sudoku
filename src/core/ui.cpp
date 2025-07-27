@@ -431,4 +431,15 @@ void ui_engine::text_box(std::string_view message, glm::ivec2 pos, i32 width, i3
     text(message, text_pos, scale);
 }
 
+void ui_engine::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height)
+{
+    auto cell_centre = pos;
+    cell_centre.x += width / 2;
+    cell_centre.y += height / 2;
+    box_centred(cell_centre, width * 0.9f, height * 0.9f, {static_cast<u64>(10 * coord.x + coord.y)});
+    if (cell.value.has_value()) {
+        text_box(std::format("{}", *cell.value), pos, width, height, 6);
+    }
+}
+
 }

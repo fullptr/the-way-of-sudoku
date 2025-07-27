@@ -173,13 +173,7 @@ auto scene_game(sudoku::window& window) -> next_state
                 auto cell_top_left = top_left;
                 cell_top_left.x += x * cell_size;
                 cell_top_left.y += y * cell_size;
-                auto cell_centre = cell_top_left;
-                cell_centre.x += cell_size / 2;
-                cell_centre.y += cell_size / 2;
-                ui.box_centred(cell_centre, cell_size * 0.9f, cell_size * 0.9f, {static_cast<u64>(10*x+y)});
-                if (board.at(x, y).value.has_value()) {
-                    ui.text_box(std::format("{}", board.at(x, y).value.value()), cell_top_left, cell_size, cell_size, 6);
-                }
+                ui.cell(board.at(x, y), {x, y}, cell_top_left, cell_size, cell_size);
             }
         }
 

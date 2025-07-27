@@ -3,6 +3,7 @@
 #include "shader.hpp"
 #include "texture.hpp"
 #include "event.hpp"
+#include "sudoku.hpp"
 #include "common.hpp"
 
 #include <array>
@@ -168,6 +169,7 @@ public:
     void box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key = {});
     void text(std::string_view message, glm::ivec2 pos, i32 size);
     void text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 size);
+    void cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height);
     
     // Step 3: draw
     void draw_frame(i32 screen_width, i32 screen_height, f64 dt);

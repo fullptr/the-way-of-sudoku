@@ -35,7 +35,7 @@ public:
     }
 };
 
-auto make_board(std::vector<std::string_view> cells) -> sudoku_board
+inline auto make_board(std::vector<std::string_view> cells) -> sudoku_board
 {
     const auto size = cells.size();
     for (const auto& row : cells) {
