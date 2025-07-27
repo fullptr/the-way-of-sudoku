@@ -8,9 +8,21 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/norm.hpp>
+#include <glm/gtx/hash.hpp>
 
 #include <format>
 #include <print>
+
+struct sudoku_cell
+{
+    std::optional<int> value;
+    bool               fixed;
+};
+
+struct sudoku_board
+{
+    std::unordered_map<glm::ivec2, sudoku_cell> cells;
+};
 
 enum class next_state
 {
@@ -85,6 +97,26 @@ auto scene_game(sand::window& window) -> next_state
     auto timer = sand::timer{};
     auto ui    = sand::ui_engine{};
 
+    auto board = sudoku_board{};
+    for (int x = 0; x != 9; ++x) {
+        for (int y = 0; y != 9; ++y) {
+            board.cells[{x, y}] = sudoku_cell{ .value={}, .fixed=false};
+        }
+    }
+#define ADD_CELL(x, y, val) board.cells[{(x), (y)}] = sudoku_cell{ .value={(val)}, .fixed=true};
+    ADD_CELL(0, 0, 2);
+    ADD_CELL(3, 0, 9);
+    ADD_CELL(4, 0, 1);
+    ADD_CELL(6, 0, 5);
+    ADD_CELL(7, 0, 6);
+    ADD_CELL(8, 0, 8);
+    ADD_CELL(3, 1, 2);
+    ADD_CELL(4, 1, 5);
+    ADD_CELL(5, 1, 4);
+    ADD_CELL(6, 1, 1);
+    ADD_CELL(0, 2, 1);
+#undef ADD_CELL;
+
     while (window.is_running()) {
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
@@ -92,16 +124,35 @@ auto scene_game(sand::window& window) -> next_state
         for (const auto event : window.events()) {
             ui.on_event(event);
         }
-        
-        const auto scale = 3.0f;
-        const auto button_width = 200;
-        const auto button_height = 50;
-        const auto button_left = (window.width() - button_width) / 2;
 
-        if (ui.button("Back", {button_left, 160}, button_width, button_height, scale)) {
+        if (ui.button("Back", {0, 0}, 100, 50, 3)) {
             std::print("exiting!\n");
             return next_state::main_menu;
         }
+
+        const auto board_size = 0.9 * std::min(window.width(), window.height());
+        const auto cell_size = board_size / 9;
+
+        auto top_left = glm::ivec2{window.width() / 2, window.height() / 2};
+        top_left.x -= board_size / 2;
+        top_left.y -= board_size / 2;
+
+        for (int y = 0; y != 9; ++y) {
+            for (int x = 0; x != 9; ++x) {
+                auto cell_top_left = top_left;
+                cell_top_left.x += x * cell_size;
+                cell_top_left.y += y * cell_size;
+                auto cell_centre = cell_top_left;
+                cell_centre.x += cell_size / 2;
+                cell_centre.y += cell_size / 2;
+                ui.box_centred(cell_centre, cell_size * 0.9f, cell_size * 0.9f, {static_cast<u64>(10*x+y)});
+                if (board.cells[{x, y}].value.has_value()) {
+                    ui.text_box(std::format("{}", board.cells[{x, y}].value.value()), cell_top_left, cell_size, cell_size, 6);
+                }
+            }
+        }
+
+       // ui.box(top_left, board_size, board_size);
 
         ui.draw_frame(window.width(), window.height(), dt);
         window.end_frame();
@@ -127,12 +178,8 @@ auto main() -> int
             } break;
             case next_state::exit: {
                 std::print("closing game\n");
-                return 1;
+                return 0;
             } break;
-            default: {
-                std::print("how did we get here\n");
-                return 1; // TODO: Handle this better
-            }
         }
     }
     

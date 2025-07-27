@@ -15,19 +15,31 @@ namespace sand {
 
 class widget_key
 {
+    u64              d_id;
     std::string_view d_file;
     u64              d_line;
     u64              d_column;
 
 public:
+    widget_key(u64 id, std::source_location loc = std::source_location::current())
+        : d_id{id}
+        , d_file{loc.file_name()}
+        , d_line{loc.line()}
+        , d_column{loc.column()}
+    {}
     widget_key(std::source_location loc = std::source_location::current())
-        : d_file{loc.file_name()}
+        : d_id{0}
+        , d_file{loc.file_name()}
         , d_line{loc.line()}
         , d_column{loc.column()}
     {}
     auto operator<=>(const widget_key&) const = default;
     auto operator==(const widget_key&) const -> bool = default;
-    auto hash() const -> std::size_t { return 1; }
+    auto hash() const -> std::size_t {
+        // TODO: Make this better
+        static constexpr auto h = std::hash<u64>{};
+        return h(d_id) ^ h(d_line) ^ h(d_column);
+    }
 };
 
 }
@@ -152,6 +164,8 @@ public:
 
     // Step 2: setup ui elements    
     bool button(std::string_view msg, glm::ivec2 pos, i32 width, i32 height, i32 scale, const widget_key& key = {});
+    void box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key = {});
+    void box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key = {});
     void text(std::string_view message, glm::ivec2 pos, i32 size);
     void text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 size);
     
