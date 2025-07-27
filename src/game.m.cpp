@@ -140,10 +140,8 @@ auto scene_game(sudoku::window& window) -> next_state
             ui.on_event(event);
 
             if (auto e = event.get_if<keyboard_pressed_event>()) {
-                std::print("got event\n");
                 if (auto cell = hovered_cell(board, window)) {
                     switch (e->key) {
-                        case keyboard::num_0: cell->value = 0; break;
                         case keyboard::num_1: cell->value = 1; break;
                         case keyboard::num_2: cell->value = 2; break;
                         case keyboard::num_3: cell->value = 3; break;
