@@ -9,14 +9,20 @@ namespace sudoku {
 
 struct sudoku_cell
 {
-    std::optional<int> value = {};
+    std::optional<i32> value = {};
     bool               fixed = false;
+    std::optional<i32> region = {};
+};
+
+struct sudoku_region
+{
+    std::vector<glm::ivec2> cells;
 };
 
 class sudoku_board
 {
-    u64                      d_size;
-    std::vector<sudoku_cell> d_cells;
+    u64                        d_size;
+    std::vector<sudoku_cell>   d_cells;
 
 public:
     sudoku_board(u64 size)

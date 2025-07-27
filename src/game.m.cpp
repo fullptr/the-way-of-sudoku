@@ -163,6 +163,25 @@ auto scene_game(sudoku::window& window) -> next_state
         "..4.",
         "3...",
     });
+    board.at(0, 0).region = 1;
+    board.at(0, 1).region = 1;
+    board.at(1, 0).region = 1;
+    board.at(1, 1).region = 1;
+
+    board.at(2, 0).region = 2;
+    board.at(2, 1).region = 2;
+    board.at(3, 0).region = 2;
+    board.at(3, 1).region = 2;
+
+    board.at(0, 2).region = 3;
+    board.at(0, 3).region = 3;
+    board.at(1, 2).region = 3;
+    board.at(1, 3).region = 3;
+
+    board.at(2, 2).region = 4;
+    board.at(2, 3).region = 4;
+    board.at(3, 2).region = 4;
+    board.at(3, 3).region = 4;
 #endif
 
     while (window.is_running()) {
@@ -241,6 +260,23 @@ auto scene_game(sudoku::window& window) -> next_state
         shapes.draw_line(tr, br, from_hex(0xecf0f1), 2.0f);
         shapes.draw_line(br, bl, from_hex(0xecf0f1), 2.0f);
         shapes.draw_line(bl, tl, from_hex(0xecf0f1), 2.0f);
+
+        // draw regions
+        for (i32 x = 0; x != board.size(); ++x) {
+            for (i32 y = 0; y != board.size(); ++y) {
+                if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
+                    const auto a = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y) * glm::vec2{0, cell_size};
+                    const auto b = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
+                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.0f);
+                }
+
+                if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
+                    const auto a = tl + float(x) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
+                    const auto b = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
+                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.0f);
+                }
+            }
+        }
 
         ui.draw_frame(window.width(), window.height(), dt);
         shapes.end_frame();
