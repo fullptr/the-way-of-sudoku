@@ -238,7 +238,7 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        const auto board_size = 0.9 * std::min(window.width(), window.height());
+        const auto board_size = 0.9f * std::min(window.width(), window.height());
         const auto cell_size = board_size / board.size();
 
         auto top_left = glm::ivec2{window.width() / 2, window.height() / 2};
@@ -279,14 +279,14 @@ auto scene_game(sudoku::window& window) -> next_state
         for (i32 x = 0; x != board.size(); ++x) {
             for (i32 y = 0; y != board.size(); ++y) {
                 if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
-                    const auto a = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y) * glm::vec2{0, cell_size};
-                    const auto b = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
+                    const auto a = tl + cell_size * glm::vec2{x + 1, y};
+                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
                     shapes.draw_line(a, b, from_hex(0xecf0f1), 2.5f);
                 }
 
                 if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
-                    const auto a = tl + float(x) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
-                    const auto b = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
+                    const auto a = tl + cell_size * glm::vec2{x,     y + 1};
+                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
                     shapes.draw_line(a, b, from_hex(0xecf0f1), 2.5f);
                 }
             }
