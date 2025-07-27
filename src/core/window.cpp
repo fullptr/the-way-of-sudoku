@@ -164,6 +164,13 @@ auto window::events() -> std::span<const event>
     return d_data.events;
 }
 
+auto window::mouse_pos() const -> glm::ivec2
+{
+    double x, y;
+    glfwGetCursorPos(d_data.native_window, &x, &y);
+    return {static_cast<i32>(x), static_cast<i32>(y)};
+}
+
 bool window::is_running() const
 {
     return d_data.running;

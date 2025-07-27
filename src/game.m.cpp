@@ -27,6 +27,33 @@ enum class next_state
 
 constexpr auto clear_colour = sudoku::from_hex(0x222f3e);
 
+namespace sudoku {
+
+auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
+{
+    const auto mouse_pos = w.mouse_pos();
+    
+    const auto board_size = 0.9 * std::min(w.width(), w.height());
+    const auto cell_size = board_size / board.size();
+
+    auto top_left = glm::ivec2{w.width() / 2, w.height() / 2};
+    top_left.x -= board_size / 2;
+    top_left.y -= board_size / 2;
+
+    const auto mouse_pos_sudoku_space = mouse_pos - top_left;
+
+    if (0 <= mouse_pos_sudoku_space.x && mouse_pos_sudoku_space.x < board_size && 0 <= mouse_pos_sudoku_space.y && mouse_pos_sudoku_space.y < board_size) {
+        const auto x = mouse_pos_sudoku_space.x / cell_size;
+        const auto y = mouse_pos_sudoku_space.y / cell_size;
+        return &board.at(x, y);
+    }
+
+    return nullptr;
+}
+
+}
+
+
 auto scene_main_menu(sudoku::window& window) -> next_state
 {
     using namespace sudoku;
@@ -111,6 +138,24 @@ auto scene_game(sudoku::window& window) -> next_state
 
         for (const auto event : window.events()) {
             ui.on_event(event);
+
+            if (auto e = event.get_if<keyboard_pressed_event>()) {
+                std::print("got event\n");
+                if (auto cell = hovered_cell(board, window)) {
+                    switch (e->key) {
+                        case keyboard::num_0: cell->value = 0; break;
+                        case keyboard::num_1: cell->value = 1; break;
+                        case keyboard::num_2: cell->value = 2; break;
+                        case keyboard::num_3: cell->value = 3; break;
+                        case keyboard::num_4: cell->value = 4; break;
+                        case keyboard::num_5: cell->value = 5; break;
+                        case keyboard::num_6: cell->value = 6; break;
+                        case keyboard::num_7: cell->value = 7; break;
+                        case keyboard::num_8: cell->value = 8; break;
+                        case keyboard::num_9: cell->value = 9; break;
+                    }
+                }
+            }
         }
 
         if (ui.button("Back", {0, 0}, 100, 50, 3)) {
