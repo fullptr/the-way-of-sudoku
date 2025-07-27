@@ -3,7 +3,7 @@
 
 #include <bitset>
 
-namespace sand {
+namespace sudoku {
 
 class input
 {

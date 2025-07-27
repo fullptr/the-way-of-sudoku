@@ -9,7 +9,7 @@
 #include <ranges>
 #include <print>
 
-namespace sand {
+namespace sudoku {
 namespace {
 
 auto load_pixel_font_atlas() -> font_atlas
@@ -361,11 +361,11 @@ bool ui_engine::button(
     }
     else if (data.is_hovered()) {
         const auto t = std::clamp(data.time_hovered(d_time) / lerp_time, 0.0, 1.0);
-        colour = sand::lerp(unhovered_colour, hovered_colour, t);
+        colour = sudoku::lerp(unhovered_colour, hovered_colour, t);
     }
     else if (d_time > lerp_time) { // Don't start the game looking hovered
         const auto t = std::clamp(data.time_unhovered(d_time) / lerp_time, 0.0, 1.0);
-        colour = sand::lerp(hovered_colour, unhovered_colour, t);
+        colour = sudoku::lerp(hovered_colour, unhovered_colour, t);
     }
     
     const auto quad = ui_graphics_quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}};

@@ -7,7 +7,7 @@
 
 #include <cstddef>
 
-namespace sand {
+namespace sudoku {
 namespace {
 
 constexpr auto line_vertex = R"SHADER(

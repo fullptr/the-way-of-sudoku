@@ -9,7 +9,7 @@
 #include <fstream>
 #include <print>
 
-namespace sand {
+namespace sudoku {
 namespace {
 
 auto compile_shader(std::uint32_t type, const char* source) -> std::uint32_t

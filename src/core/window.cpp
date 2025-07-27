@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <print>
 
-namespace sand {
+namespace sudoku {
 namespace {
 
 auto get_window_data(GLFWwindow* window) -> window_data&

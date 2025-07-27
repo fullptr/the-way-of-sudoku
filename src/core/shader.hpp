@@ -7,7 +7,7 @@
 #include <string>
 #include <filesystem>
 
-namespace sand {
+namespace sudoku {
 
 class shader
 {

@@ -12,7 +12,7 @@
 
 struct GLFWwindow;
 
-namespace sand {
+namespace sudoku {
 
 using window_callback = std::function<void(const event&)>;
 

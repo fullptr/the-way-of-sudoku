@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 
-namespace sand {
+namespace sudoku {
 
 using i8  = std::int8_t;
 using i16 = std::int16_t;
@@ -65,11 +65,11 @@ struct chunk_pos
 }
 
 template <>
-struct std::hash<sand::chunk_pos>
+struct std::hash<sudoku::chunk_pos>
 {
-    auto operator()(sand::chunk_pos pos) const noexcept -> std::size_t
+    auto operator()(sudoku::chunk_pos pos) const noexcept -> std::size_t
     {
-        static const auto hasher = std::hash<sand::i32>{};
+        static const auto hasher = std::hash<sudoku::i32>{};
         return hasher(pos.x) ^ hasher(pos.y);
     }
 };

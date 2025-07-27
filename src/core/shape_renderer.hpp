@@ -8,7 +8,7 @@
 
 #include <memory>
 
-namespace sand {
+namespace sudoku {
 
 struct line_instance
 {

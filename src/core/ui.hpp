@@ -11,7 +11,7 @@
 
 #include <glm/glm.hpp>
 
-namespace sand {
+namespace sudoku {
 
 class widget_key
 {
@@ -45,15 +45,15 @@ public:
 }
 
 template<>
-struct std::hash<sand::widget_key>
+struct std::hash<sudoku::widget_key>
 {
-    auto operator()(const sand::widget_key& wk) const -> std::size_t
+    auto operator()(const sudoku::widget_key& wk) const -> std::size_t
     {
         return wk.hash();
     }
 };
 
-namespace sand {
+namespace sudoku {
 
 struct character
 {

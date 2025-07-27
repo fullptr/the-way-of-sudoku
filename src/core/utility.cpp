@@ -10,7 +10,7 @@
 
 #include <Windows.h>
 
-namespace sand {
+namespace sudoku {
 
 timer::timer()
     : d_clock()
@@ -99,12 +99,12 @@ auto get_executable_filepath() -> std::filesystem::path
     }
 }
 
-auto mouse_pos_world_space(const input& in, const sand::camera& c) -> glm::vec2
+auto mouse_pos_world_space(const input& in, const sudoku::camera& c) -> glm::vec2
 {
     return in.position() / c.world_to_screen + c.top_left;
 }
 
-auto pixel_at_mouse(const input& in, const sand::camera& c) -> pixel_pos
+auto pixel_at_mouse(const input& in, const sudoku::camera& c) -> pixel_pos
 {
     const auto p = glm::ivec2{mouse_pos_world_space(in, c)};
     return {p.x, p.y};
@@ -112,31 +112,31 @@ auto pixel_at_mouse(const input& in, const sand::camera& c) -> pixel_pos
 
 auto pixel_to_physics(glm::vec2 px) -> b2Vec2
 {
-    b2Vec2 pos(static_cast<float>(px.x) / sand::config::pixels_per_meter, static_cast<float>(px.y) / sand::config::pixels_per_meter);
+    b2Vec2 pos(static_cast<float>(px.x) / sudoku::config::pixels_per_meter, static_cast<float>(px.y) / sudoku::config::pixels_per_meter);
     return pos;
 }
 
 auto pixel_to_physics(pixel_pos px) -> b2Vec2
 {
-    b2Vec2 pos(static_cast<float>(px.x) / sand::config::pixels_per_meter, static_cast<float>(px.y) / sand::config::pixels_per_meter);
+    b2Vec2 pos(static_cast<float>(px.x) / sudoku::config::pixels_per_meter, static_cast<float>(px.y) / sudoku::config::pixels_per_meter);
     return pos;
 }
 
 auto pixel_to_physics(float px) -> float
 {
-    return px / sand::config::pixels_per_meter;
+    return px / sudoku::config::pixels_per_meter;
 }
 
 // Converts a point in world space to pixel space
 auto physics_to_pixel(b2Vec2 px) -> glm::vec2
 {
-    glm::vec2 pos(px.x * sand::config::pixels_per_meter, px.y * sand::config::pixels_per_meter);
+    glm::vec2 pos(px.x * sudoku::config::pixels_per_meter, px.y * sudoku::config::pixels_per_meter);
     return pos;
 }
 
 auto physics_to_pixel(float px) -> float
 {
-    return px * sand::config::pixels_per_meter;
+    return px * sudoku::config::pixels_per_meter;
 }
     
 }

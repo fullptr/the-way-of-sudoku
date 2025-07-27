@@ -50,13 +50,13 @@ enum class next_state
     exit,
 };
 
-constexpr auto clear_colour = sand::from_hex(0x222f3e);
+constexpr auto clear_colour = sudoku::from_hex(0x222f3e);
 
-auto scene_main_menu(sand::window& window) -> next_state
+auto scene_main_menu(sudoku::window& window) -> next_state
 {
-    using namespace sand;
-    auto timer = sand::timer{};
-    auto ui    = sand::ui_engine{};
+    using namespace sudoku;
+    auto timer = sudoku::timer{};
+    auto ui    = sudoku::ui_engine{};
 
     while (window.is_running()) {
         const double dt = timer.on_update();
@@ -102,7 +102,7 @@ auto scene_main_menu(sand::window& window) -> next_state
         ui.text("0123456789 () {} [] ^ < > - _ = + ! ? : ; . , @ % $ / \\ \" ' # ~ & | `", {para_left, para_top + 9 * 11 * scale}, scale);
 
         std::array<char, 8> buf = {};
-        ui.text_box(sand::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3);
+        ui.text_box(sudoku::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3);
         ui.draw_frame(window.width(), window.height(), dt);
         window.end_frame();
     }
@@ -110,11 +110,11 @@ auto scene_main_menu(sand::window& window) -> next_state
     return next_state::exit;
 }
 
-auto scene_game(sand::window& window) -> next_state
+auto scene_game(sudoku::window& window) -> next_state
 {
-    using namespace sand;
-    auto timer = sand::timer{};
-    auto ui    = sand::ui_engine{};
+    using namespace sudoku;
+    auto timer = sudoku::timer{};
+    auto ui    = sudoku::ui_engine{};
 
     auto board = make_board({
         "2..91.568",
@@ -174,9 +174,9 @@ auto scene_game(sand::window& window) -> next_state
 
 auto main() -> int
 {
-    using namespace sand;
+    using namespace sudoku;
 
-    auto window = sand::window{"sandfall", 1280, 720};
+    auto window = sudoku::window{"The Way of Sudoku", 1280, 720};
     auto next   = next_state::main_menu;
 
     while (true) {

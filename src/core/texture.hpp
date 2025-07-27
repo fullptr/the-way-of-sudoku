@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 
-namespace sand {
+namespace sudoku {
 
 class texture_dyn
 {

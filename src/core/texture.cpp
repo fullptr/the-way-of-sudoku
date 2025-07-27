@@ -7,7 +7,7 @@
 #include <cassert>
 #include <print>
 
-namespace sand {
+namespace sudoku {
 
 texture_dyn::texture_dyn(i32 width, i32 height)
 {
