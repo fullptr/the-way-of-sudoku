@@ -54,31 +54,39 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
 
 auto check_solution(const sudoku_board& board) -> bool
 {
-    std::unordered_set<i32> seen; 
-
     // check rows
     for (i32 row = 0; row != board.size(); ++row) {
+        std::unordered_set<i32> seen; 
         for (i32 col = 0; col != board.size(); ++col) {
             const auto val = board.at(row, col).value;
             if (!val.has_value()) return false;
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return false; // duplicate values in the row
-        seen.clear();
     }
 
     // check columns
     for (i32 col = 0; col != board.size(); ++col) {
+        std::unordered_set<i32> seen; 
         for (i32 row = 0; row != board.size(); ++row) {
             const auto val = board.at(row, col).value;
-            if (!val.has_value()) return false;
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return false; // duplicate values in the row
-        seen.clear();
     }
 
-    // check boxes
+    // check regions
+    std::unordered_map<i32, std::unordered_set<i32>> regions;
+    for (i32 row = 0; row != board.size(); ++row) {
+        for (i32 col = 0; col != board.size(); ++col) {
+            if (board.at(row, col).region.has_value()) {
+                regions[*board.at(row,col).region].insert(*board.at(row, col).value);
+            }
+        }
+    }
+    for (const auto& [region, seen] : regions) {
+        if (seen.size() != board.size()) return false;
+    }
 
     return true;
 }
