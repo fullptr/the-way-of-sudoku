@@ -140,7 +140,7 @@ auto scene_game(sudoku::window& window) -> next_state
             ui.on_event(event);
 
             if (auto e = event.get_if<keyboard_pressed_event>()) {
-                if (auto cell = hovered_cell(board, window)) {
+                if (auto cell = hovered_cell(board, window); cell && !cell->fixed) {
                     switch (e->key) {
                         case keyboard::num_1: cell->value = 1; break;
                         case keyboard::num_2: cell->value = 2; break;
@@ -151,6 +151,7 @@ auto scene_game(sudoku::window& window) -> next_state
                         case keyboard::num_7: cell->value = 7; break;
                         case keyboard::num_8: cell->value = 8; break;
                         case keyboard::num_9: cell->value = 9; break;
+                        case keyboard::backspace: cell->value = {}; break;
                     }
                 }
             }
