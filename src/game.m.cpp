@@ -157,31 +157,19 @@ auto scene_game(sudoku::window& window) -> next_state
         "..6891..3"
     });
 #else
-    auto board = make_board({
-        "...1",
-        ".1..",
-        "..4.",
-        "3...",
-    });
-    board.at(0, 0).region = 1;
-    board.at(0, 1).region = 1;
-    board.at(1, 0).region = 1;
-    board.at(1, 1).region = 1;
-
-    board.at(2, 0).region = 2;
-    board.at(2, 1).region = 2;
-    board.at(3, 0).region = 2;
-    board.at(3, 1).region = 2;
-
-    board.at(0, 2).region = 3;
-    board.at(0, 3).region = 3;
-    board.at(1, 2).region = 3;
-    board.at(1, 3).region = 3;
-
-    board.at(2, 2).region = 4;
-    board.at(2, 3).region = 4;
-    board.at(3, 2).region = 4;
-    board.at(3, 3).region = 4;
+    auto board = make_board(
+        {
+            "...1",
+            ".1..",
+            "..4.",
+            "3...",
+        }, {
+            "1122",
+            "1122",
+            "3344",
+            "3344",
+        }
+    );
 #endif
 
     while (window.is_running()) {

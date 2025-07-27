@@ -47,9 +47,13 @@ public:
     }
 };
 
-inline auto make_board(std::vector<std::string_view> cells) -> sudoku_board
+inline auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
 {
     const auto size = cells.size();
+    if (regions.size() != size) {
+        std::print("make_board failed - regions don't align\n");
+        std::exit(1);
+    }
     for (const auto& row : cells) {
         if (row.size() != size) {
             std::print("make_board failed - not a square!\n");
@@ -64,6 +68,7 @@ inline auto make_board(std::vector<std::string_view> cells) -> sudoku_board
                 board.at(x, y).value = static_cast<int>(row[x] - '0');
                 board.at(x, y).fixed = true;
             }
+            board.at(x, y).region = static_cast<i32>(regions[y][x] - '0');
         }
     }
     return board;
