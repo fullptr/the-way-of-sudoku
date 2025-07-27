@@ -208,17 +208,25 @@ auto scene_game(sudoku::window& window) -> next_state
 
             if (auto e = event.get_if<keyboard_pressed_event>()) {
                 if (auto cell = hovered_cell(board, window); cell && !cell->fixed) {
+                    std::optional<i32> value = {};
                     switch (e->key) {
-                        case keyboard::num_1: cell->value = 1; break;
-                        case keyboard::num_2: cell->value = 2; break;
-                        case keyboard::num_3: cell->value = 3; break;
-                        case keyboard::num_4: cell->value = 4; break;
-                        case keyboard::num_5: cell->value = 5; break;
-                        case keyboard::num_6: cell->value = 6; break;
-                        case keyboard::num_7: cell->value = 7; break;
-                        case keyboard::num_8: cell->value = 8; break;
-                        case keyboard::num_9: cell->value = 9; break;
-                        case keyboard::backspace: cell->value = {}; break;
+                        case keyboard::num_1: value = 1; break;
+                        case keyboard::num_2: value = 2; break;
+                        case keyboard::num_3: value = 3; break;
+                        case keyboard::num_4: value = 4; break;
+                        case keyboard::num_5: value = 5; break;
+                        case keyboard::num_6: value = 6; break;
+                        case keyboard::num_7: value = 7; break;
+                        case keyboard::num_8: value = 8; break;
+                        case keyboard::num_9: value = 9; break;
+                        case keyboard::backspace: value = -1; break;
+                    }
+                    if (value) {
+                        if (*value == -1) {
+                            cell->value = {};
+                        } else if (*value <= board.size()) {
+                            cell->value = *value;
+                        }
                     }
                 }
             }
