@@ -56,13 +56,6 @@ auto scene_main_menu(sudoku::window& window) -> next_state
             return next_state::exit;
         }
 
-        if (ui.button("Enable Vsync", {10, 50}, button_width, button_height, scale)) {
-            window.enable_vsync(true);
-        }
-        if (ui.button("Disable Vsync", {10, 110}, button_width, button_height, scale)) {
-            window.enable_vsync(false);
-        }
-
         const auto para_left = 100;
         const auto para_top = 300;
         ui.text("Lorem ipsum dolor sit amet, consectetur adipiscing elit,", {para_left, para_top}, scale);
@@ -91,7 +84,7 @@ auto scene_game(sudoku::window& window) -> next_state
     auto timer = sudoku::timer{};
     auto ui    = sudoku::ui_engine{};
 
-#if 0
+#if 1
     auto board = make_board({
         "2..91.568",
         "...2541..",
