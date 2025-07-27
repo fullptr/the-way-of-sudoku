@@ -4,6 +4,7 @@
 #include "texture.hpp"
 #include "event.hpp"
 #include "sudoku.hpp"
+#include "utility.hpp"
 #include "common.hpp"
 
 #include <array>
@@ -167,8 +168,9 @@ public:
     bool button(std::string_view msg, glm::ivec2 pos, i32 width, i32 height, i32 scale, const widget_key& key = {});
     void box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key = {});
     void box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key = {});
-    void text(std::string_view message, glm::ivec2 pos, i32 size);
-    void text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 size);
+    void text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
+    void text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
+
     void cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height);
     
     // Step 3: draw
