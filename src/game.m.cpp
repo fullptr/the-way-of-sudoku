@@ -91,6 +91,7 @@ auto scene_game(sudoku::window& window) -> next_state
     auto timer = sudoku::timer{};
     auto ui    = sudoku::ui_engine{};
 
+#if 0
     auto board = make_board({
         "2..91.568",
         "...2541..",
@@ -102,6 +103,14 @@ auto scene_game(sudoku::window& window) -> next_state
         "...7..8..",
         "..6891..3"
     });
+#else
+    auto board = make_board({
+        "2..9",
+        "...2",
+        "1...",
+        "3...",
+    });
+#endif
 
     while (window.is_running()) {
         const double dt = timer.on_update();
@@ -117,14 +126,14 @@ auto scene_game(sudoku::window& window) -> next_state
         }
 
         const auto board_size = 0.9 * std::min(window.width(), window.height());
-        const auto cell_size = board_size / 9;
+        const auto cell_size = board_size / board.size();
 
         auto top_left = glm::ivec2{window.width() / 2, window.height() / 2};
         top_left.x -= board_size / 2;
         top_left.y -= board_size / 2;
 
-        for (int y = 0; y != 9; ++y) {
-            for (int x = 0; x != 9; ++x) {
+        for (int y = 0; y != board.size(); ++y) {
+            for (int x = 0; x != board.size(); ++x) {
                 auto cell_top_left = top_left;
                 cell_top_left.x += x * cell_size;
                 cell_top_left.y += y * cell_size;
