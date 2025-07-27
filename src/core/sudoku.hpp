@@ -30,6 +30,12 @@ public:
         return d_cells[x + y * d_size];
     }
 
+    auto at(u64 x, u64 y) const -> const sudoku_cell& {
+        assert(x < d_size);
+        assert(y < d_size);
+        return d_cells[x + y * d_size];
+    }
+
     auto size() const -> u64 {
         return d_size;
     }

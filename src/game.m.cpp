@@ -17,6 +17,7 @@
 #include <string>
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
 
 enum class next_state
 {
@@ -49,6 +50,35 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
     }
 
     return nullptr;
+}
+
+auto check_solution(const sudoku_board& board) -> bool
+{
+    std::unordered_set<i32> seen;
+
+    // check rows
+    for (i32 row = 0; row != board.size(); ++row) {
+        for (i32 col = 0; col != board.size(); ++col) {
+            const auto val = board.at(row, col).value;
+            if (!val.has_value()) return false;
+            seen.insert(*val);
+        }
+        if (seen.size() != board.size()) return false; // duplicate values in the row
+    }
+
+    // check columns
+    for (i32 col = 0; col != board.size(); ++col) {
+        for (i32 row = 0; row != board.size(); ++row) {
+            const auto val = board.at(row, col).value;
+            if (!val.has_value()) return false;
+            seen.insert(*val);
+        }
+        if (seen.size() != board.size()) return false; // duplicate values in the row
+    }
+
+    // check boxes
+
+    return true;
 }
 
 }
@@ -160,6 +190,15 @@ auto scene_game(sudoku::window& window) -> next_state
         if (ui.button("Back", {0, 0}, 100, 50, 3)) {
             std::print("exiting!\n");
             return next_state::main_menu;
+        }
+
+        if (ui.button("Check Solution", {0, 55}, 100, 50, 3)) {
+            const auto success =  check_solution(board);
+            if (success) {
+                std::print("solved!\n");
+            } else {
+                std::print("bad!\n");
+            }
         }
 
         const auto board_size = 0.9 * std::min(window.width(), window.height());
