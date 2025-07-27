@@ -4,6 +4,7 @@
 #include "utility.hpp"
 #include "shape_renderer.hpp"
 #include "ui.hpp"
+#include "sudoku.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -16,32 +17,6 @@
 #include <string>
 #include <optional>
 #include <unordered_map>
-
-struct sudoku_cell
-{
-    std::optional<int> value;
-    bool               fixed;
-};
-
-struct sudoku_board
-{
-    std::unordered_map<glm::ivec2, sudoku_cell> cells;
-};
-
-auto make_board(std::vector<std::string_view> cells) -> sudoku_board
-{
-    auto board = sudoku_board{};
-    for (int y = 0; y != cells.size(); ++y) {
-        const auto& row = cells[y];
-        for (int x = 0; x != row.size(); ++x) {
-            if (row[x] != '.') {
-                board.cells[{x, y}].value = static_cast<int>(row[x] - '0');
-                board.cells[{x, y}].fixed = true;
-            }
-        }
-    }
-    return board;
-}
 
 enum class next_state
 {
@@ -157,8 +132,8 @@ auto scene_game(sudoku::window& window) -> next_state
                 cell_centre.x += cell_size / 2;
                 cell_centre.y += cell_size / 2;
                 ui.box_centred(cell_centre, cell_size * 0.9f, cell_size * 0.9f, {static_cast<u64>(10*x+y)});
-                if (board.cells[{x, y}].value.has_value()) {
-                    ui.text_box(std::format("{}", board.cells[{x, y}].value.value()), cell_top_left, cell_size, cell_size, 6);
+                if (board.at(x, y).value.has_value()) {
+                    ui.text_box(std::format("{}", board.at(x, y).value.value()), cell_top_left, cell_size, cell_size, 6);
                 }
             }
         }
