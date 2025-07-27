@@ -323,20 +323,20 @@ void shape_renderer::begin_frame(const camera& c)
     d_line_shader.bind();
     d_line_shader.load_int("u_camera_width", c.screen_width);
     d_line_shader.load_int("u_camera_height", c.screen_height);
-    d_line_shader.load_vec2("u_camera_top_left", c.top_left);
-    d_line_shader.load_float("u_camera_world_to_screen", c.world_to_screen);
+    d_line_shader.load_vec2("u_camera_top_left", glm::vec2{0, 0});
+    d_line_shader.load_float("u_camera_world_to_screen", 1);
 
     d_circle_shader.bind();
     d_circle_shader.load_int("u_camera_width", c.screen_width);
     d_circle_shader.load_int("u_camera_height", c.screen_height);
-    d_circle_shader.load_vec2("u_camera_top_left", c.top_left);
-    d_circle_shader.load_float("u_camera_world_to_screen", c.world_to_screen);
+    d_circle_shader.load_vec2("u_camera_top_left", glm::vec2{0, 0});
+    d_circle_shader.load_float("u_camera_world_to_screen", 1);
 
-    const auto dimensions = glm::vec2{c.screen_width, c.screen_height} / c.world_to_screen;
+    const auto dimensions = glm::vec2{c.screen_width, c.screen_height};
     const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
 
     d_quad_shader.bind();
-    d_quad_shader.load_mat4("u_proj_matrix", glm::translate(projection, glm::vec3{-c.top_left, 0.0f}));
+    d_quad_shader.load_mat4("u_proj_matrix", glm::translate(projection, glm::vec3{-glm::vec2{0, 0}, 0.0f}));
 }
 
 void shape_renderer::end_frame()

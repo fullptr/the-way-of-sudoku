@@ -142,8 +142,9 @@ auto scene_game(sudoku::window& window) -> next_state
     using namespace sudoku;
     auto timer = sudoku::timer{};
     auto ui    = sudoku::ui_engine{};
+    auto shapes = sudoku::shape_renderer{};
 
-#if 1
+#if 0
     auto board = make_board({
         "2..91.568",
         "...2541..",
@@ -157,9 +158,9 @@ auto scene_game(sudoku::window& window) -> next_state
     });
 #else
     auto board = make_board({
-        "2..9",
-        "...2",
-        "1...",
+        "...1",
+        ".1..",
+        "..4.",
         "3...",
     });
 #endif
@@ -167,6 +168,7 @@ auto scene_game(sudoku::window& window) -> next_state
     while (window.is_running()) {
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
+        shapes.begin_frame({window.width(), window.height()});
 
         for (const auto event : window.events()) {
             ui.on_event(event);
@@ -189,12 +191,12 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        if (ui.button("Back", {0, 0}, 100, 50, 3)) {
+        if (ui.button("Back", {0, 0}, 200, 50, 3)) {
             std::print("exiting!\n");
             return next_state::main_menu;
         }
 
-        if (ui.button("Check Solution", {0, 55}, 100, 50, 3)) {
+        if (ui.button("Check Solution", {0, 55}, 200, 50, 3)) {
             const auto success =  check_solution(board);
             if (success) {
                 std::print("solved!\n");
@@ -217,11 +219,31 @@ auto scene_game(sudoku::window& window) -> next_state
                 cell_top_left.y += y * cell_size;
                 ui.cell(board.at(x, y), {x, y}, cell_top_left, cell_size, cell_size);
             }
+            
         }
 
-       // ui.box(top_left, board_size, board_size);
+        // draw boundary
+        const auto tl = glm::vec2{top_left};
+        const auto tr = glm::vec2{top_left} + glm::vec2{board_size, 0};
+        const auto bl = glm::vec2{top_left} + glm::vec2{0, board_size};
+        const auto br = glm::vec2{top_left} + glm::vec2{board_size, board_size};
+
+        for (i32 i = 1; i != board.size(); ++i) {
+            const auto offset = glm::vec2{0, i * cell_size};
+            shapes.draw_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 1.0f);
+        }
+        for (i32 i = 1; i != board.size(); ++i) {
+            const auto offset = glm::vec2{i * cell_size, 0};
+            shapes.draw_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 1.0f);
+        }
+
+        shapes.draw_line(tl, tr, from_hex(0xecf0f1), 2.0f);
+        shapes.draw_line(tr, br, from_hex(0xecf0f1), 2.0f);
+        shapes.draw_line(br, bl, from_hex(0xecf0f1), 2.0f);
+        shapes.draw_line(bl, tl, from_hex(0xecf0f1), 2.0f);
 
         ui.draw_frame(window.width(), window.height(), dt);
+        shapes.end_frame();
         window.end_frame();
     }
 

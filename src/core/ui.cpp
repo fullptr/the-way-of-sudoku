@@ -439,7 +439,7 @@ void ui_engine::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, 
     auto cell_centre = pos;
     cell_centre.x += width / 2;
     cell_centre.y += height / 2;
-    box_centred(cell_centre, width * 0.9f, height * 0.9f, {static_cast<u64>(10 * coord.x + coord.y)});
+    box_centred(cell_centre, width, height, {static_cast<u64>(10 * coord.x + coord.y)});
     if (cell.value.has_value()) {
         if (cell.fixed) {
             text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_fixed);
