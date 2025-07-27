@@ -12,21 +12,31 @@ namespace sudoku {
 
 struct sudoku_cell
 {
-    std::optional<int> value;
-    bool               fixed;
+    std::optional<int> value = {};
+    bool               fixed = false;
 };
 
 class sudoku_board
 {
-    std::unordered_map<glm::ivec2, sudoku_cell> cells;
+    u64 d_size;
+    std::vector<sudoku_cell> d_cells;
 
 public:
-    auto at(int x, int y) -> sudoku_cell& { return cells[{x, y}]; }
+    sudoku_board(u64 size)
+        : d_size{size}, d_cells{size * size}
+    {
+    }
+
+    auto at(u64 x, u64 y) -> sudoku_cell& {
+        assert(x < d_size);
+        assert(y < d_size);
+        return d_cells[x + y * d_size];
+    }
 };
 
 auto make_board(std::vector<std::string_view> cells) -> sudoku_board
 {
-    auto board = sudoku_board{};
+    auto board = sudoku_board{9};
     for (int y = 0; y != cells.size(); ++y) {
         const auto& row = cells[y];
         for (int x = 0; x != row.size(); ++x) {
