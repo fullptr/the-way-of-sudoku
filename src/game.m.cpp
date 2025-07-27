@@ -152,7 +152,7 @@ auto scene_game(sudoku::window& window) -> next_state
     auto ui    = sudoku::ui_engine{};
     auto shapes = sudoku::shape_renderer{};
 
-#if 1
+#if 0
     auto board = make_board(
         {
             "2..91.568",
@@ -179,15 +179,21 @@ auto scene_game(sudoku::window& window) -> next_state
 #else
     auto board = make_board(
         {
-            "...1",
-            ".1..",
-            "..4.",
-            "3...",
+            "..57341",
+            "54..217",
+            "3714..6",
+            "1.6375.",
+            "..2..7.",
+            "4.75.62",
+            "7..2.35",
         }, {
-            "1122",
-            "1122",
-            "3344",
-            "3344",
+            "1122223",
+            "1112223",
+            "4115533",
+            "4455533",
+            "4455663",
+            "4777666",
+            "4777766",
         }
     );
 #endif
@@ -257,17 +263,17 @@ auto scene_game(sudoku::window& window) -> next_state
 
         for (i32 i = 1; i != board.size(); ++i) {
             const auto offset = glm::vec2{0, i * cell_size};
-            shapes.draw_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 1.0f);
+            shapes.draw_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
         }
         for (i32 i = 1; i != board.size(); ++i) {
             const auto offset = glm::vec2{i * cell_size, 0};
-            shapes.draw_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 1.0f);
+            shapes.draw_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
         }
 
-        shapes.draw_line(tl, tr, from_hex(0xecf0f1), 2.0f);
-        shapes.draw_line(tr, br, from_hex(0xecf0f1), 2.0f);
-        shapes.draw_line(br, bl, from_hex(0xecf0f1), 2.0f);
-        shapes.draw_line(bl, tl, from_hex(0xecf0f1), 2.0f);
+        shapes.draw_line(tl, tr, from_hex(0xecf0f1), 2.5f);
+        shapes.draw_line(tr, br, from_hex(0xecf0f1), 2.5f);
+        shapes.draw_line(br, bl, from_hex(0xecf0f1), 2.5f);
+        shapes.draw_line(bl, tl, from_hex(0xecf0f1), 2.5f);
 
         // draw regions
         for (i32 x = 0; x != board.size(); ++x) {
@@ -275,13 +281,13 @@ auto scene_game(sudoku::window& window) -> next_state
                 if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
                     const auto a = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y) * glm::vec2{0, cell_size};
                     const auto b = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
-                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.0f);
+                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.5f);
                 }
 
                 if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
                     const auto a = tl + float(x) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
                     const auto b = tl + float(x + 1) * glm::vec2{cell_size, 0} + float(y + 1) * glm::vec2{0, cell_size};
-                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.0f);
+                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.5f);
                 }
             }
         }
