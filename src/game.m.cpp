@@ -54,7 +54,7 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
 
 auto check_solution(const sudoku_board& board) -> bool
 {
-    std::unordered_set<i32> seen;
+    std::unordered_set<i32> seen; 
 
     // check rows
     for (i32 row = 0; row != board.size(); ++row) {
@@ -64,6 +64,7 @@ auto check_solution(const sudoku_board& board) -> bool
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return false; // duplicate values in the row
+        seen.clear();
     }
 
     // check columns
@@ -74,6 +75,7 @@ auto check_solution(const sudoku_board& board) -> bool
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return false; // duplicate values in the row
+        seen.clear();
     }
 
     // check boxes
