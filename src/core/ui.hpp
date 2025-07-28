@@ -155,7 +155,8 @@ public:
     void cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height);
     
     // Step 3: draw
-    void draw_frame(i32 screen_width, i32 screen_height, f64 dt);
+    void end_frame(f64 dt);
+    void draw_frame(i32 screen_width, i32 screen_height);
 };
 
 }

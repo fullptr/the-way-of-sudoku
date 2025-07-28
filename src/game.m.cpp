@@ -138,7 +138,9 @@ auto scene_main_menu(sudoku::window& window) -> next_state
 
         std::array<char, 8> buf = {};
         ui.text_box(sudoku::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3);
-        ui.draw_frame(window.width(), window.height(), dt);
+        ui.end_frame(dt);
+        
+        ui.draw_frame(window.width(), window.height());
         window.end_frame();
     }
 
@@ -299,7 +301,9 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        ui.draw_frame(window.width(), window.height(), dt);
+        ui.end_frame(dt);
+
+        ui.draw_frame(window.width(), window.height());
         shapes.draw_frame(window.width(), window.height());
         window.end_frame();
     }

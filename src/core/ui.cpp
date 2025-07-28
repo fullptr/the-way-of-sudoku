@@ -243,7 +243,7 @@ static auto is_in_region(glm::vec2 pos, glm::vec2 top_left, f32 width, f32 heigh
         && top_left.y <= pos.y && pos.y < top_left.y + height;
 }
 
-void ui_engine::draw_frame(i32 screen_width, i32 screen_height, f64 dt)
+void ui_engine::end_frame(f64 dt)
 {
     // Clean out any elements no longer around
     std::erase_if(d_data, [&](auto& elem) {
@@ -284,7 +284,10 @@ void ui_engine::draw_frame(i32 screen_width, i32 screen_height, f64 dt)
     
     d_clicked_this_frame = false;
     d_unclicked_this_frame = false;
-    
+}
+
+void ui_engine::draw_frame(i32 screen_width, i32 screen_height)
+{    
     glBindVertexArray(d_vao);
     d_atlas.texture->bind();
     d_graphics_quad_shader.load_int("u_use_texture", 1);
