@@ -98,7 +98,8 @@ auto scene_main_menu(sudoku::window& window) -> next_state
 {
     using namespace sudoku;
     auto timer = sudoku::timer{};
-    auto ui    = sudoku::ui_engine{};
+    auto shapes = sudoku::shape_renderer{};
+    auto ui    = sudoku::ui_engine{&shapes};
 
     while (window.is_running()) {
         const double dt = timer.on_update();
@@ -139,8 +140,9 @@ auto scene_main_menu(sudoku::window& window) -> next_state
         std::array<char, 8> buf = {};
         ui.text_box(sudoku::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3);
         ui.end_frame(dt);
-        
+
         ui.draw_frame(window.width(), window.height());
+        shapes.draw_frame(window.width(), window.height());
         window.end_frame();
     }
 
@@ -151,8 +153,8 @@ auto scene_game(sudoku::window& window) -> next_state
 {
     using namespace sudoku;
     auto timer = sudoku::timer{};
-    auto ui    = sudoku::ui_engine{};
     auto shapes = sudoku::shape_renderer{};
+    auto ui    = sudoku::ui_engine{&shapes};
 
 #if 0
     auto board = make_board(

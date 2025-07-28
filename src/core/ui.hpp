@@ -102,6 +102,7 @@ struct ui_logic_quad
     auto time_unclicked(f64 now) const -> f64 { return glm::max(0.0, now - unclicked_time); }
 };
 
+class shape_renderer;
 class ui_engine
 {
     u32 d_vao;
@@ -124,7 +125,7 @@ class ui_engine
     std::unordered_map<widget_key, ui_logic_quad> d_data;
     
     shader d_graphics_quad_shader;
-    font_atlas d_atlas;
+    shape_renderer* d_renderer;
 
     const ui_logic_quad& get_data(const widget_key& key, glm::vec2 top_left, f32 width, f32 height) { 
         auto& data = d_data[key];
@@ -139,7 +140,7 @@ class ui_engine
     ui_engine& operator=(const ui_engine&) = delete;
 
 public:
-    ui_engine();
+    ui_engine(shape_renderer* renderer);
     ~ui_engine();
 
     // Step 1: process events

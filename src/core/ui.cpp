@@ -1,6 +1,7 @@
 #include "ui.hpp"
 #include "common.hpp"
 #include "utility.hpp"
+#include "shape_renderer.hpp"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -11,113 +12,6 @@
 
 namespace sudoku {
 namespace {
-
-auto load_pixel_font_atlas() -> font_atlas
-{
-    font_atlas atlas;
-    atlas.texture = std::make_unique<texture_png>("res\\pixel_font.png");
-    atlas.missing_char = { .position{24, 52}, .size{5, 6}, .bearing{0, -6}, .advance=6 };
-    atlas.height = 7;
-    
-    atlas.chars['A'] = { .position{0, 0}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['B'] = { .position{6, 0}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['C'] = { .position{12, 0}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['D'] = { .position{18, 0}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['E'] = { .position{24, 0}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['F'] = { .position{29, 0}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['G'] = { .position{34, 0}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['H'] = { .position{40, 0}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['I'] = { .position{46, 0}, .size={3, 7}, .bearing={0, -7}, .advance=4 };
-    atlas.chars['J'] = { .position{50, 0}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['K'] = { .position{55, 0}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['L'] = { .position{60, 0}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['M'] = { .position{0, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['N'] = { .position{6, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['O'] = { .position{12, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['P'] = { .position{18, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['Q'] = { .position{24, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['R'] = { .position{30, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['S'] = { .position{36, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['T'] = { .position{42, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['U'] = { .position{48, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['V'] = { .position{54, 8}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['W'] = { .position{0, 16}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['X'] = { .position{6, 16}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['Y'] = { .position{12, 16}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['Z'] = { .position{18, 16}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-
-    atlas.chars['a'] = { .position{24, 18}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['b'] = { .position{29, 16}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['c'] = { .position{34, 18}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['d'] = { .position{39, 16}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['e'] = { .position{44, 18}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['f'] = { .position{49, 16}, .size={3, 10}, .bearing={0, -7}, .advance=4 };
-    atlas.chars['g'] = { .position{53, 18}, .size={4, 8}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['h'] = { .position{58, 16}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['i'] = { .position{63, 16}, .size={1, 7}, .bearing={0, -7}, .advance=2 };
-    atlas.chars['j'] = { .position{1, 24}, .size={2, 10}, .bearing={0, -7}, .advance=3 };
-    atlas.chars['k'] = { .position{4, 24}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['l'] = { .position{9, 24}, .size={1, 7}, .bearing={0, -7}, .advance=2 };
-    atlas.chars['m'] = { .position{11, 26}, .size={5, 5}, .bearing={0, -5}, .advance=6 };
-    atlas.chars['n'] = { .position{17, 26}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['o'] = { .position{22, 26}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['p'] = { .position{27, 26}, .size={4, 7}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['q'] = { .position{32, 26}, .size={5, 7}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['r'] = { .position{37, 26}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['s'] = { .position{42, 26}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['t'] = { .position{47, 24}, .size={2, 7}, .bearing={0, -7}, .advance=3 };
-    atlas.chars['u'] = { .position{50, 26}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['v'] = { .position{55, 26}, .size={5, 5}, .bearing={0, -5}, .advance=6 };
-    atlas.chars['w'] = { .position{0, 34}, .size={5, 5}, .bearing={0, -5}, .advance=6 };
-    atlas.chars['x'] = { .position{6, 34}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['y'] = { .position{11, 34}, .size={4, 8}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['z'] = { .position{16, 34}, .size={4, 5}, .bearing={0, -5}, .advance=5 };
-
-    atlas.chars['1'] = { .position{0, 43}, .size={3, 7}, .bearing={0, -7}, .advance=4 };
-    atlas.chars['2'] = { .position{4, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['3'] = { .position{10, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['4'] = { .position{16, 43}, .size={4, 7}, .bearing={0, -7}, .advance=5 };
-    atlas.chars['5'] = { .position{21, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['6'] = { .position{27, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['7'] = { .position{33, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['8'] = { .position{39, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['9'] = { .position{45, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['0'] = { .position{51, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-
-    atlas.chars['#'] = { .position{42, 51}, .size={5, 5}, .bearing={0, -6}, .advance=6 };
-    atlas.chars['&'] = { .position{28, 35}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['~'] = { .position{6, 40}, .size={4, 2}, .bearing={0, -5}, .advance=5 };
-    atlas.chars['!'] = { .position{60, 8}, .size={1, 7}, .bearing={0, -7}, .advance=2 };
-    atlas.chars['?'] = { .position{57, 43}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['$'] = { .position{36, 51}, .size={5, 9}, .bearing={0, -8}, .advance=6 };
-    atlas.chars[';'] = { .position{62, 10}, .size={2, 5}, .bearing={0, -5}, .advance=3 };
-    atlas.chars[':'] = { .position{63, 10}, .size={1, 4}, .bearing={0, -5}, .advance=2 };
-    atlas.chars[','] = { .position{61, 29}, .size={2, 2}, .bearing={0, -2}, .advance=3 };
-    atlas.chars['.'] = { .position{62, 29}, .size={1, 1}, .bearing={0, -1}, .advance=2 };
-    atlas.chars[' '] = { .position{0, 0}, .size={1, 1}, .bearing={0, 0}, .advance=3 };
-    atlas.chars['('] = { .position{38, 32}, .size={2, 9}, .bearing={0, -8}, .advance=3 };
-    atlas.chars[')'] = { .position{41, 32}, .size={2, 9}, .bearing={0, -8}, .advance=3 };
-    atlas.chars['{'] = { .position{44, 32}, .size={3, 9}, .bearing={0, -8}, .advance=4 };
-    atlas.chars['}'] = { .position{48, 32}, .size={3, 9}, .bearing={0, -8}, .advance=4 };
-    atlas.chars['['] = { .position{30, 51}, .size={2, 9}, .bearing={0, -8}, .advance=3 };
-    atlas.chars[']'] = { .position{33, 51}, .size={2, 9}, .bearing={0, -8}, .advance=3 };
-    atlas.chars['^'] = { .position{52, 32}, .size={5, 3}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['<'] = { .position{58, 32}, .size={3, 5}, .bearing={0, -6}, .advance=4 };
-    atlas.chars['>'] = { .position{61, 34}, .size={3, 5}, .bearing={0, -6}, .advance=4 };
-    atlas.chars['_'] = { .position{1, 41}, .size={4, 1}, .bearing={0, 0}, .advance=5 };
-    atlas.chars['-'] = { .position{1, 41}, .size={3, 1}, .bearing={0, -4}, .advance=4 };
-    atlas.chars['+'] = { .position{0, 51}, .size={3, 3}, .bearing={0, -5}, .advance=4 };
-    atlas.chars['='] = { .position{4, 51}, .size={3, 3}, .bearing={0, -5}, .advance=4 };
-    atlas.chars['/'] = { .position{21, 32}, .size={3, 7}, .bearing={0, -7}, .advance=4 };
-    atlas.chars['@'] = { .position{12, 51}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['%'] = { .position{18, 51}, .size={5, 7}, .bearing={0, -7}, .advance=6 };
-    atlas.chars['\\'] = { .position{24, 32}, .size={3, 7}, .bearing={0, -7}, .advance=4 };
-    atlas.chars['\"'] = { .position{8, 51}, .size={3, 2}, .bearing={0, -7}, .advance=4 };
-    atlas.chars['\''] = { .position{8, 51}, .size={1, 2}, .bearing={0, -7}, .advance=2 };
-    atlas.chars['|'] = { .position{48, 51}, .size={1, 9}, .bearing={0, -8}, .advance=2 };
-    atlas.chars['`'] = { .position{50, 51}, .size={2, 2}, .bearing={0, -7}, .advance=3 };
-    return atlas;
-}
 
 constexpr auto quad_vertex = R"SHADER(
     #version 410 core
@@ -205,9 +99,9 @@ void ui_graphics_quad::set_buffer_attributes(std::uint32_t vbo)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-ui_engine::ui_engine()
+ui_engine::ui_engine(shape_renderer* renderer)
     : d_graphics_quad_shader(quad_vertex, quad_fragment)
-    , d_atlas{load_pixel_font_atlas()}
+    , d_renderer{renderer}
 {
     const float vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f};
     const std::uint32_t indices[] = {0, 1, 2, 0, 2, 3};
@@ -289,7 +183,7 @@ void ui_engine::end_frame(f64 dt)
 void ui_engine::draw_frame(i32 screen_width, i32 screen_height)
 {    
     glBindVertexArray(d_vao);
-    d_atlas.texture->bind();
+    d_renderer->get_atlas().texture->bind();
     d_graphics_quad_shader.load_int("u_use_texture", 1);
 
     glEnable(GL_BLEND);
@@ -356,8 +250,8 @@ bool ui_engine::button(
     if (!msg.empty()) {
         constexpr auto colour_fixed = from_hex(0xecf0f1);
         auto text_pos = pos;
-        text_pos.x += (width - d_atlas.length_of(msg) * scale) / 2;
-        text_pos.y += (height + d_atlas.height * scale) / 2;
+        text_pos.x += (width - d_renderer->get_atlas().length_of(msg) * scale) / 2;
+        text_pos.y += (height + d_renderer->get_atlas().height * scale) / 2;
         text(msg, text_pos, scale, colour_fixed);
     }
     return data.clicked_this_frame;
@@ -388,7 +282,7 @@ void ui_engine::box_centred(glm::ivec2 centre, i32 width, i32 height, const widg
 void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour)
 {
     for (char c : message) {
-        const auto ch = d_atlas.get_character(c);
+        const auto ch = d_renderer->get_atlas().get_character(c);
 
         const auto quad = ui_graphics_quad{
             pos + (size * ch.bearing),
@@ -408,8 +302,8 @@ void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size, glm::ve
 void ui_engine::text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
 {
     auto text_pos = pos;
-    text_pos.x += (width - d_atlas.length_of(message) * scale) / 2;
-    text_pos.y += (height + d_atlas.height * scale) / 2;
+    text_pos.x += (width - d_renderer->get_atlas().length_of(message) * scale) / 2;
+    text_pos.y += (height + d_renderer->get_atlas().height * scale) / 2;
     text(message, text_pos, scale, colour);
 }
 
