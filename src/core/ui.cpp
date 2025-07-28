@@ -206,7 +206,7 @@ void ui_graphics_quad::set_buffer_attributes(std::uint32_t vbo)
 }
 
 ui_engine::ui_engine()
-    : d_shader(quad_vertex, quad_fragment)
+    : d_graphics_quad_shader(quad_vertex, quad_fragment)
     , d_atlas{load_pixel_font_atlas()}
 {
     const float vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f};
@@ -226,8 +226,8 @@ ui_engine::ui_engine()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    d_shader.bind();
-    d_shader.load_sampler("u_texture", 0);
+    d_graphics_quad_shader.bind();
+    d_graphics_quad_shader.load_sampler("u_texture", 0);
 }
 
 ui_engine::~ui_engine()
@@ -287,7 +287,7 @@ void ui_engine::draw_frame(i32 screen_width, i32 screen_height, f64 dt)
     
     glBindVertexArray(d_vao);
     d_atlas.texture->bind();
-    d_shader.load_int("u_use_texture", 1);
+    d_graphics_quad_shader.load_int("u_use_texture", 1);
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -296,8 +296,8 @@ void ui_engine::draw_frame(i32 screen_width, i32 screen_height, f64 dt)
     const auto dimensions = glm::vec2{screen_width, screen_height};
     const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
     
-    d_shader.bind();
-    d_shader.load_mat4("u_proj_matrix", projection);
+    d_graphics_quad_shader.bind();
+    d_graphics_quad_shader.load_mat4("u_proj_matrix", projection);
     d_instances.bind<ui_graphics_quad>(d_quads);
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_quads.size());
 

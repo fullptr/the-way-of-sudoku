@@ -109,11 +109,9 @@ class ui_engine
     u32 d_ebo;
 
     std::vector<ui_graphics_quad> d_quads;
-
-    shader d_shader;
-
+    
     vertex_buffer d_instances;
-
+    
     // Data from events
     glm::vec2 d_mouse_pos            = {0, 0};
     bool      d_clicked_this_frame   = false;
@@ -122,9 +120,10 @@ class ui_engine
     // Data from update
     f64       d_time                 = 0.0;
     bool      d_capture_mouse        = false;
-
+    
     std::unordered_map<widget_key, ui_logic_quad> d_data;
-
+    
+    shader d_graphics_quad_shader;
     font_atlas d_atlas;
 
     const ui_logic_quad& get_data(const widget_key& key, glm::vec2 top_left, f32 width, f32 height) { 
