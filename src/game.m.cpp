@@ -201,7 +201,6 @@ auto scene_game(sudoku::window& window) -> next_state
     while (window.is_running()) {
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
-        shapes.begin_frame({window.width(), window.height()});
 
         for (const auto event : window.events()) {
             ui.on_event(event);
@@ -301,7 +300,7 @@ auto scene_game(sudoku::window& window) -> next_state
         }
 
         ui.draw_frame(window.width(), window.height(), dt);
-        shapes.end_frame();
+        shapes.draw_frame(window.width(), window.height());
         window.end_frame();
     }
 

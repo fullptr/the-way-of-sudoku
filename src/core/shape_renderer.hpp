@@ -64,8 +64,7 @@ public:
     shape_renderer();
     ~shape_renderer();
 
-    void begin_frame(const camera& c);
-    void end_frame();
+    void draw_frame(i32 screen_width, i32 screen_height);
 
     void draw_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour);
     void draw_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour);

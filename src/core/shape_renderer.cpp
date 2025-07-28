@@ -304,33 +304,25 @@ shape_renderer::~shape_renderer()
     glDeleteVertexArrays(1, &d_vao);
 }
 
-void shape_renderer::begin_frame(const camera& c)
-{
-    glBindVertexArray(d_vao);
-    d_lines.clear();
-    d_circles.clear();
-    d_quads.clear();
-
-    d_line_shader.bind();
-    d_line_shader.load_int("u_camera_height", c.screen_height);
-
-    d_circle_shader.bind();
-    d_circle_shader.load_int("u_camera_height", c.screen_height);
-
-    const auto dimensions = glm::vec2{c.screen_width, c.screen_height};
-    const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
-
-    d_quad_shader.bind();
-    d_quad_shader.load_mat4("u_proj_matrix", glm::translate(projection, glm::vec3{-glm::vec2{0, 0}, 0.0f}));
-}
-
-void shape_renderer::end_frame()
+void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
 {
     glBindVertexArray(d_vao);
 
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    d_line_shader.bind();
+    d_line_shader.load_int("u_camera_height", screen_height);
+
+    d_circle_shader.bind();
+    d_circle_shader.load_int("u_camera_height", screen_height);
+
+    const auto dimensions = glm::vec2{screen_width, screen_height};
+    const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
+
+    d_quad_shader.bind();
+    d_quad_shader.load_mat4("u_proj_matrix", glm::translate(projection, glm::vec3{-glm::vec2{0, 0}, 0.0f}));
 
     d_quad_shader.bind();
     d_instances.bind<quad_instance>(d_quads);
@@ -345,6 +337,9 @@ void shape_renderer::end_frame()
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_circles.size());
 
     glDisable(GL_BLEND);
+    d_lines.clear();
+    d_circles.clear();
+    d_quads.clear();
 }
 
 void shape_renderer::draw_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour)
