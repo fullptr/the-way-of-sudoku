@@ -141,7 +141,6 @@ auto scene_main_menu(sudoku::window& window) -> next_state
         ui.text_box(sudoku::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3);
         ui.end_frame(dt);
 
-        ui.draw_frame(window.width(), window.height());
         shapes.draw_frame(window.width(), window.height());
         window.end_frame();
     }
@@ -263,7 +262,6 @@ auto scene_game(sudoku::window& window) -> next_state
                 cell_top_left.y += y * cell_size;
                 ui.cell(board.at(x, y), {x, y}, cell_top_left, cell_size, cell_size);
             }
-            
         }
 
         // draw boundary
@@ -305,7 +303,6 @@ auto scene_game(sudoku::window& window) -> next_state
 
         ui.end_frame(dt);
 
-        ui.draw_frame(window.width(), window.height());
         shapes.draw_frame(window.width(), window.height());
         window.end_frame();
     }

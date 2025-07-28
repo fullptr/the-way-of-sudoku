@@ -51,20 +51,19 @@ class shape_renderer
     u32 d_vbo;
     u32 d_ebo;
 
-    std::vector<quad_instance>   d_quads;
-    std::vector<line_instance>   d_lines;
-    std::vector<circle_instance> d_circles;
+    std::vector<quad_instance>    d_quads;
+    std::vector<line_instance>    d_lines;
+    std::vector<circle_instance>  d_circles;
+    std::vector<ui_graphics_quad> d_gquads;
 
     shader d_quad_shader;
     shader d_line_shader;
     shader d_circle_shader;
+    shader d_graphics_quad_shader;
 
     vertex_buffer d_instances;
 
     font_atlas d_atlas;
-
-    std::vector<ui_graphics_quad> d_gquads;
-    shader d_graphics_quad_shader;
 
 public:
     shape_renderer();
@@ -78,8 +77,9 @@ public:
     void draw_line(glm::vec2 begin, glm::vec2 end, glm::vec4 colour, float thickness);
     void draw_circle(glm::vec2 centre, glm::vec4 colour, float radius);
     void draw_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius);
+    void draw_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour);
+    void draw_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour);
 
-    auto get_atlas() -> font_atlas& { return d_atlas; }
     auto submit_gquad(const ui_graphics_quad& quad) { d_gquads.push_back(quad); }
 };
 

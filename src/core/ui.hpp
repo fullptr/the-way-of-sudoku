@@ -129,7 +129,6 @@ public:
     
     // Step 3: draw
     void end_frame(f64 dt);
-    void draw_frame(i32 screen_width, i32 screen_height);
 };
 
 }

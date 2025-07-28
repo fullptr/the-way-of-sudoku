@@ -573,5 +573,34 @@ void shape_renderer::draw_annulus(glm::vec2 centre, glm::vec4 colour, float inne
 {
     d_circles.emplace_back(centre, inner_radius, outer_radius, colour, colour, 0.0f);
 }
+
+void shape_renderer::draw_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour)
+{
+    for (char c : message) {
+        const auto ch = d_atlas.get_character(c);
+
+        const auto quad = ui_graphics_quad{
+            pos + (size * ch.bearing),
+            size * ch.size.x,
+            size * ch.size.y,
+            0.0f,
+            colour,
+            1,
+            ch.position,
+            ch.size
+        };
+        d_gquads.push_back(quad);
+        pos.x += size * ch.advance;
+    }
+}
+
+void shape_renderer::draw_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
+{
+    if (message.empty()) return;
+    auto text_pos = pos;
+    text_pos.x += (width - d_atlas.length_of(message) * scale) / 2;
+    text_pos.y += (height + d_atlas.height * scale) / 2;
+    draw_text(message, text_pos, scale, colour);
+}
     
 }

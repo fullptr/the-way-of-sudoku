@@ -66,11 +66,6 @@ void ui_engine::end_frame(f64 dt)
     d_unclicked_this_frame = false;
 }
 
-void ui_engine::draw_frame(i32 screen_width, i32 screen_height)
-{    
-
-}
-
 bool ui_engine::on_event(const event& event)
 {
     if (const auto e = event.get_if<mouse_moved_event>()) {
@@ -114,14 +109,7 @@ bool ui_engine::button(
     
     const auto quad = ui_graphics_quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}};
     d_renderer->submit_gquad(quad);
-
-    if (!msg.empty()) {
-        constexpr auto colour_fixed = from_hex(0xecf0f1);
-        auto text_pos = pos;
-        text_pos.x += (width - d_renderer->get_atlas().length_of(msg) * scale) / 2;
-        text_pos.y += (height + d_renderer->get_atlas().height * scale) / 2;
-        text(msg, text_pos, scale, colour_fixed);
-    }
+    d_renderer->draw_text_box(msg, pos, width, height, scale, from_hex(0xecf0f1));
     return data.clicked_this_frame;
 }
 
@@ -149,30 +137,12 @@ void ui_engine::box_centred(glm::ivec2 centre, i32 width, i32 height, const widg
 
 void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour)
 {
-    for (char c : message) {
-        const auto ch = d_renderer->get_atlas().get_character(c);
-
-        const auto quad = ui_graphics_quad{
-            pos + (size * ch.bearing),
-            size * ch.size.x,
-            size * ch.size.y,
-            0.0f,
-            colour,
-            1,
-            ch.position,
-            ch.size
-        };
-        d_renderer->submit_gquad(quad);
-        pos.x += size * ch.advance;
-    }
+    d_renderer->draw_text(message, pos, size, colour);
 }
 
 void ui_engine::text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
 {
-    auto text_pos = pos;
-    text_pos.x += (width - d_renderer->get_atlas().length_of(message) * scale) / 2;
-    text_pos.y += (height + d_renderer->get_atlas().height * scale) / 2;
-    text(message, text_pos, scale, colour);
+    d_renderer->draw_text_box(message, pos, width, height, scale, colour);
 }
 
 void ui_engine::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height)
