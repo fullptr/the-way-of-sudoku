@@ -63,6 +63,9 @@ class shape_renderer
 
     font_atlas d_atlas;
 
+    std::vector<ui_graphics_quad> d_gquads;
+    shader d_graphics_quad_shader;
+
 public:
     shape_renderer();
     ~shape_renderer();
@@ -77,6 +80,7 @@ public:
     void draw_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius);
 
     auto get_atlas() -> font_atlas& { return d_atlas; }
+    auto submit_gquad(const ui_graphics_quad& quad) { d_gquads.push_back(quad); }
 };
 
 }

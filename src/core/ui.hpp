@@ -87,13 +87,7 @@ struct ui_logic_quad
 class shape_renderer;
 class ui_engine
 {
-    u32 d_vao;
-    u32 d_vbo;
-    u32 d_ebo;
-
-    std::vector<ui_graphics_quad> d_quads;
-    
-    vertex_buffer d_instances;
+    shape_renderer* d_renderer;
     
     // Data from events
     glm::vec2 d_mouse_pos            = {0, 0};
@@ -105,9 +99,6 @@ class ui_engine
     bool      d_capture_mouse        = false;
     
     std::unordered_map<widget_key, ui_logic_quad> d_data;
-    
-    shader d_graphics_quad_shader;
-    shape_renderer* d_renderer;
 
     const ui_logic_quad& get_data(const widget_key& key, glm::vec2 top_left, f32 width, f32 height) { 
         auto& data = d_data[key];
@@ -123,7 +114,6 @@ class ui_engine
 
 public:
     ui_engine(shape_renderer* renderer);
-    ~ui_engine();
 
     // Step 1: process events
     bool on_event(const event& e);

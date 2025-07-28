@@ -227,6 +227,72 @@ void main()
 }
 )SHADER";
 
+constexpr auto gquad_vertex = R"SHADER(
+    #version 410 core
+    layout (location = 0) in vec2 p_position;
+    
+    layout (location = 1) in ivec2 quad_top_left;
+    layout (location = 2) in int   quad_width;
+    layout (location = 3) in int   quad_height;
+    layout (location = 4) in float quad_angle;
+    layout (location = 5) in vec4  quad_colour;
+    layout (location = 6) in int   quad_use_texture;
+    layout (location = 7) in ivec2 quad_uv_pos;
+    layout (location = 8) in ivec2 quad_uv_size;
+    
+    uniform mat4      u_proj_matrix;
+    uniform sampler2D u_texture;
+    
+    flat out int o_use_texture;
+    out vec4     o_colour;
+    out vec2     o_uv;
+    
+    mat2 rotate(float theta)
+    {
+        float c = cos(theta);
+        float s = sin(theta);
+        return mat2(c, s, -s, c);
+    }
+    
+    void main()
+    {
+        vec2 dimensions = vec2(quad_width, quad_height) / 2;
+        vec2 position = quad_top_left + dimensions;
+    
+        vec2 screen_position = rotate(quad_angle) * (p_position * dimensions) + position;
+    
+        gl_Position = u_proj_matrix * vec4(screen_position, 0, 1);
+    
+        o_use_texture = quad_use_texture;
+        o_colour = quad_colour;
+
+        o_uv = (p_position + vec2(1, 1)) / 2;
+        o_uv = (o_uv * quad_uv_size + quad_uv_pos) / textureSize(u_texture, 0);
+    }
+)SHADER";
+    
+constexpr auto gquad_fragment = R"SHADER(
+    #version 410 core
+    layout (location = 0) out vec4 out_colour;
+    
+    flat in int o_use_texture;
+    in vec4     o_colour;
+    in vec2     o_uv;
+
+    uniform int       u_use_texture;
+    uniform sampler2D u_texture;
+    
+    void main()
+    {
+        if (o_use_texture > 0) {
+            float red = texture(u_texture, o_uv).r;
+            out_colour = vec4(o_colour.xyz, red);
+        } else {
+            out_colour = o_colour;
+        }
+    }
+)SHADER";
+
 auto load_pixel_font_atlas() -> font_atlas
 {
     font_atlas atlas;
@@ -386,6 +452,7 @@ shape_renderer::shape_renderer()
     : d_line_shader(line_vertex, line_fragment)
     , d_circle_shader(circle_vertex, circle_fragment)
     , d_quad_shader(quad_vertex, quad_fragment)
+    , d_graphics_quad_shader(gquad_vertex, gquad_fragment)
     , d_atlas{load_pixel_font_atlas()}
 {
     const float vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f};
@@ -404,6 +471,9 @@ shape_renderer::shape_renderer()
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
+
+    d_graphics_quad_shader.bind();
+    d_graphics_quad_shader.load_sampler("u_texture", 0);
 }
 
 shape_renderer::~shape_renderer()
@@ -415,6 +485,29 @@ shape_renderer::~shape_renderer()
 
 void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
 {
+    // TODO: Merge with the rest
+    {
+        glBindVertexArray(d_vao);
+        d_atlas.texture->bind();
+        d_graphics_quad_shader.load_int("u_use_texture", 1);
+    
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+        const auto dimensions = glm::vec2{screen_width, screen_height};
+        const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
+        
+        d_graphics_quad_shader.bind();
+        d_graphics_quad_shader.load_mat4("u_proj_matrix", projection);
+        d_instances.bind<ui_graphics_quad>(d_gquads);
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_gquads.size());
+    
+        glDisable(GL_BLEND);
+    
+        d_gquads.clear();
+    }
+
     glBindVertexArray(d_vao);
 
     glEnable(GL_BLEND);

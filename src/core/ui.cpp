@@ -11,106 +11,10 @@
 #include <print>
 
 namespace sudoku {
-namespace {
-
-constexpr auto quad_vertex = R"SHADER(
-    #version 410 core
-    layout (location = 0) in vec2 p_position;
-    
-    layout (location = 1) in ivec2 quad_top_left;
-    layout (location = 2) in int   quad_width;
-    layout (location = 3) in int   quad_height;
-    layout (location = 4) in float quad_angle;
-    layout (location = 5) in vec4  quad_colour;
-    layout (location = 6) in int   quad_use_texture;
-    layout (location = 7) in ivec2 quad_uv_pos;
-    layout (location = 8) in ivec2 quad_uv_size;
-    
-    uniform mat4      u_proj_matrix;
-    uniform sampler2D u_texture;
-    
-    flat out int o_use_texture;
-    out vec4     o_colour;
-    out vec2     o_uv;
-    
-    mat2 rotate(float theta)
-    {
-        float c = cos(theta);
-        float s = sin(theta);
-        return mat2(c, s, -s, c);
-    }
-    
-    void main()
-    {
-        vec2 dimensions = vec2(quad_width, quad_height) / 2;
-        vec2 position = quad_top_left + dimensions;
-    
-        vec2 screen_position = rotate(quad_angle) * (p_position * dimensions) + position;
-    
-        gl_Position = u_proj_matrix * vec4(screen_position, 0, 1);
-    
-        o_use_texture = quad_use_texture;
-        o_colour = quad_colour;
-
-        o_uv = (p_position + vec2(1, 1)) / 2;
-        o_uv = (o_uv * quad_uv_size + quad_uv_pos) / textureSize(u_texture, 0);
-    }
-)SHADER";
-    
-constexpr auto quad_fragment = R"SHADER(
-    #version 410 core
-    layout (location = 0) out vec4 out_colour;
-    
-    flat in int o_use_texture;
-    in vec4     o_colour;
-    in vec2     o_uv;
-
-    uniform int       u_use_texture;
-    uniform sampler2D u_texture;
-    
-    void main()
-    {
-        if (o_use_texture > 0) {
-            float red = texture(u_texture, o_uv).r;
-            out_colour = vec4(o_colour.xyz, red);
-        } else {
-            out_colour = o_colour;
-        }
-    }
-)SHADER";
-
-}
 
 ui_engine::ui_engine(shape_renderer* renderer)
-    : d_graphics_quad_shader(quad_vertex, quad_fragment)
-    , d_renderer{renderer}
+    : d_renderer{renderer}
 {
-    const float vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f};
-    const std::uint32_t indices[] = {0, 1, 2, 0, 2, 3};
-
-    glGenVertexArrays(1, &d_vao);
-    glBindVertexArray(d_vao);
-
-    glGenBuffers(1, &d_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, d_vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &d_ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, d_ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-
-    d_graphics_quad_shader.bind();
-    d_graphics_quad_shader.load_sampler("u_texture", 0);
-}
-
-ui_engine::~ui_engine()
-{
-    glDeleteBuffers(1, &d_ebo);
-    glDeleteBuffers(1, &d_vbo);
-    glDeleteVertexArrays(1, &d_vao);
 }
 
 static auto is_in_region(glm::vec2 pos, glm::vec2 top_left, f32 width, f32 height) -> bool
@@ -164,25 +68,7 @@ void ui_engine::end_frame(f64 dt)
 
 void ui_engine::draw_frame(i32 screen_width, i32 screen_height)
 {    
-    glBindVertexArray(d_vao);
-    d_renderer->get_atlas().texture->bind();
-    d_graphics_quad_shader.load_int("u_use_texture", 1);
 
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    const auto dimensions = glm::vec2{screen_width, screen_height};
-    const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
-    
-    d_graphics_quad_shader.bind();
-    d_graphics_quad_shader.load_mat4("u_proj_matrix", projection);
-    d_instances.bind<ui_graphics_quad>(d_quads);
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_quads.size());
-
-    glDisable(GL_BLEND);
-
-    d_quads.clear();
 }
 
 bool ui_engine::on_event(const event& event)
@@ -227,7 +113,7 @@ bool ui_engine::button(
     }
     
     const auto quad = ui_graphics_quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}};
-    d_quads.emplace_back(quad);
+    d_renderer->submit_gquad(quad);
 
     if (!msg.empty()) {
         constexpr auto colour_fixed = from_hex(0xecf0f1);
@@ -251,7 +137,7 @@ void ui_engine::box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key
     }
     
     const auto quad = ui_graphics_quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}};
-    d_quads.emplace_back(quad);
+    d_renderer->submit_gquad(quad);
 }
 
 void ui_engine::box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key) {
@@ -276,7 +162,7 @@ void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size, glm::ve
             ch.position,
             ch.size
         };
-        d_quads.emplace_back(quad);
+        d_renderer->submit_gquad(quad);
         pos.x += size * ch.advance;
     }
 }
