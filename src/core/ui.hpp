@@ -5,6 +5,7 @@
 #include "event.hpp"
 #include "sudoku.hpp"
 #include "utility.hpp"
+#include "font.hpp"
 #include "common.hpp"
 
 #include <array>
@@ -56,25 +57,6 @@ struct std::hash<sudoku::widget_key>
 };
 
 namespace sudoku {
-
-struct character
-{
-    glm::ivec2 position;
-    glm::ivec2 size;
-    glm::ivec2 bearing;
-    i32        advance;
-};
-
-struct font_atlas
-{
-    std::unique_ptr<texture_png>        texture;
-    std::unordered_map<char, character> chars;
-    character                           missing_char;
-    i32                                 height; // height of an "a", used for centring
-
-    auto get_character(char c) const -> const character&;
-    auto length_of(std::string_view message) -> i32;
-};
 
 // This is just a copy of quad_instance from the shape_renderer, should
 // we combine these? I'm just making a copy now since I am assuming both will

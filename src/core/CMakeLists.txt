@@ -10,6 +10,7 @@ add_library(core STATIC
     window.cpp
     shader.cpp
     texture.cpp
+    font.cpp
     utility.cpp
     input.cpp
     ui.cpp
