@@ -52,17 +52,22 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
     return nullptr;
 }
 
-auto check_solution(const sudoku_board& board) -> bool
+struct bad_solution
+{
+    std::unordered_set<glm::ivec2> empty_cells;
+};
+
+auto check_solution(const sudoku_board& board) -> std::optional<bad_solution>
 {
     // check rows
     for (i32 row = 0; row != board.size(); ++row) {
         std::unordered_set<i32> seen; 
         for (i32 col = 0; col != board.size(); ++col) {
             const auto val = board.at(row, col).value;
-            if (!val.has_value()) return false;
+            if (!val.has_value()) return bad_solution{};
             seen.insert(*val);
         }
-        if (seen.size() != board.size()) return false; // duplicate values in the row
+        if (seen.size() != board.size()) return bad_solution{}; // duplicate values in the row
     }
 
     // check columns
@@ -72,7 +77,7 @@ auto check_solution(const sudoku_board& board) -> bool
             const auto val = board.at(row, col).value;
             seen.insert(*val);
         }
-        if (seen.size() != board.size()) return false; // duplicate values in the row
+        if (seen.size() != board.size()) return bad_solution{}; // duplicate values in the row
     }
 
     // check regions
@@ -85,10 +90,10 @@ auto check_solution(const sudoku_board& board) -> bool
         }
     }
     for (const auto& [region, seen] : regions) {
-        if (seen.size() != board.size()) return false;
+        if (seen.size() != board.size()) return bad_solution{};
     }
 
-    return true;
+    return std::nullopt;
 }
 
 auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board) -> void
@@ -317,7 +322,7 @@ auto scene_game(sudoku::window& window) -> next_state
 
         if (ui.button("Check Solution", {0, 55}, 200, 50, 3)) {
             const auto success =  check_solution(board);
-            if (success) {
+            if (!success.has_value()) {
                 std::print("solved!\n");
             } else {
                 std::print("bad!\n");
