@@ -59,12 +59,26 @@ struct bad_solution
 
 auto check_solution(const sudoku_board& board) -> std::optional<bad_solution>
 {
+    auto sol = bad_solution{};
+
+    // check for empty cells
+    for (i32 row = 0; row != board.size(); ++row) {
+        for (i32 col = 0; col != board.size(); ++col) {
+            const auto val = board.at(row, col).value;
+            if (!val.has_value()) {
+                sol.empty_cells.insert(glm::ivec2{row, col});
+            }
+        }
+    }
+    if (!sol.empty_cells.empty()) { // bad solution because the board isn't filled
+        return sol;
+    }
+
     // check rows
     for (i32 row = 0; row != board.size(); ++row) {
         std::unordered_set<i32> seen; 
         for (i32 col = 0; col != board.size(); ++col) {
             const auto val = board.at(row, col).value;
-            if (!val.has_value()) return bad_solution{};
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return bad_solution{}; // duplicate values in the row
