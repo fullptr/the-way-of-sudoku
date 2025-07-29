@@ -185,7 +185,7 @@ constexpr auto quad_vertex = R"SHADER(
 #version 410 core
 layout (location = 0) in vec2 p_position;
 
-layout (location = 1) in vec2  quad_top_left;
+layout (location = 1) in ivec2 quad_top_left;
 layout (location = 2) in float quad_width;
 layout (location = 3) in float quad_height;
 layout (location = 4) in float quad_angle;
@@ -440,7 +440,7 @@ void quad_instance::set_buffer_attributes(std::uint32_t vbo)
         glEnableVertexAttribArray(i);
         glVertexAttribDivisor(i, 1);
     }
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, top_left));
+    glVertexAttribIPointer(1, 2, GL_INT, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, top_left));
     glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, width));
     glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, height));
     glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, angle));

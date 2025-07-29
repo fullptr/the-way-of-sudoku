@@ -36,11 +36,11 @@ struct circle_instance
 
 struct quad_instance
 {
-    glm::vec2 top_left;
-    float     width;
-    float     height;
-    float     angle;
-    glm::vec4 colour;
+    glm::ivec2 top_left;
+    float      width;
+    float      height;
+    float      angle;
+    glm::vec4  colour;
 
     static void set_buffer_attributes(u32 vbo);
 };
