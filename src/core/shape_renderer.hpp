@@ -34,17 +34,6 @@ struct circle_instance
     static void set_buffer_attributes(u32 vbo);
 };
 
-struct quad_instance
-{
-    glm::ivec2 top_left;
-    float      width;
-    float      height;
-    float      angle;
-    glm::vec4  colour;
-
-    static void set_buffer_attributes(u32 vbo);
-};
-
 // TEMP
 // This is just a copy of quad_instance from the shape_renderer, should
 // we combine these? I'm just making a copy now since I am assuming both will
@@ -70,12 +59,10 @@ class shape_renderer
     u32 d_vbo;
     u32 d_ebo;
 
-    std::vector<quad_instance>    d_quads;
     std::vector<line_instance>    d_lines;
     std::vector<circle_instance>  d_circles;
     std::vector<ui_graphics_quad> d_gquads;
 
-    shader d_quad_shader;
     shader d_line_shader;
     shader d_circle_shader;
     shader d_graphics_quad_shader;
