@@ -90,7 +90,7 @@ class ui_engine
     shape_renderer* d_renderer;
     
     // Data from events
-    glm::vec2 d_mouse_pos            = {0, 0};
+    glm::vec2 d_mouse_pos            = {-1, -1};
     bool      d_clicked_this_frame   = false;
     bool      d_unclicked_this_frame = false;
     
