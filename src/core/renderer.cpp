@@ -549,26 +549,5 @@ void renderer::push_text_box(std::string_view message, glm::ivec2 pos, i32 width
     text_pos.y += (height + d_atlas.height * scale) / 2;
     push_text(message, text_pos, scale, colour);
 }
-
-void renderer::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height)
-{
-    constexpr auto colour_fixed = from_hex(0xecf0f1);
-    constexpr auto colour_added = from_hex(0x1abc9c);
-
-    constexpr auto unhovered_colour = from_hex(0x2c3e50);
-    constexpr auto hovered_colour = from_hex(0x34495e);
-
-    auto cell_centre = pos;
-    cell_centre.x += width / 2;
-    cell_centre.y += height / 2;
-    push_quad(cell_centre, width, height, 0, unhovered_colour);
-    if (cell.value.has_value()) {
-        if (cell.fixed) {
-            push_text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_fixed);
-        } else {
-            push_text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_added);
-        }
-    }
-}
     
 }

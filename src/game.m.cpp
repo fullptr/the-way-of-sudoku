@@ -93,58 +93,78 @@ auto check_solution(const sudoku_board& board) -> bool
 
 auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board) -> void
 {
+    constexpr auto colour_given_digits = from_hex(0xecf0f1);
+    constexpr auto colour_added_digits = from_hex(0x1abc9c);
+
+    constexpr auto colour_cell = from_hex(0x2c3e50);
+    constexpr auto colour_cell_hightlighted = from_hex(0x34495e);
+
     const auto board_size = 0.9f * std::min(w.width(), w.height());
-        const auto cell_size = board_size / board.size();
+    const auto cell_size = board_size / board.size();
 
-        auto top_left = glm::ivec2{w.width() / 2, w.height() / 2};
-        top_left.x -= board_size / 2;
-        top_left.y -= board_size / 2;
+    auto top_left = glm::ivec2{w.width() / 2, w.height() / 2};
+    top_left.x -= board_size / 2;
+    top_left.y -= board_size / 2;
 
-        for (int y = 0; y != board.size(); ++y) {
-            for (int x = 0; x != board.size(); ++x) {
-                auto cell_top_left = top_left;
-                cell_top_left.x += x * cell_size;
-                cell_top_left.y += y * cell_size;
-                r.cell(board.at(x, y), {x, y}, cell_top_left, cell_size, cell_size);
+    for (int y = 0; y != board.size(); ++y) {
+        for (int x = 0; x != board.size(); ++x) {
+            auto cell_top_left = top_left;
+            cell_top_left.x += x * cell_size;
+            cell_top_left.y += y * cell_size;
+
+            auto cell_centre = cell_top_left;
+            cell_centre.x += cell_size / 2;
+            cell_centre.y += cell_size / 2;
+
+            const auto highlighted = is_in_region(w.mouse_pos(), cell_top_left, cell_size, cell_size);
+            const auto cell_colour = highlighted ? colour_cell_hightlighted : colour_cell;
+            r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
+
+
+            const auto& cell = board.at(x, y);
+            if (cell.value.has_value()) {
+                const auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
+                r.push_text_box(std::format("{}", *cell.value), cell_top_left, cell_size, cell_size, 6, colour);
             }
         }
+    }
 
-        // draw boundary
-        const auto tl = glm::vec2{top_left};
-        const auto tr = glm::vec2{top_left} + glm::vec2{board_size, 0};
-        const auto bl = glm::vec2{top_left} + glm::vec2{0, board_size};
-        const auto br = glm::vec2{top_left} + glm::vec2{board_size, board_size};
+    // draw boundary
+    const auto tl = glm::vec2{top_left};
+    const auto tr = glm::vec2{top_left} + glm::vec2{board_size, 0};
+    const auto bl = glm::vec2{top_left} + glm::vec2{0, board_size};
+    const auto br = glm::vec2{top_left} + glm::vec2{board_size, board_size};
 
-        for (i32 i = 1; i != board.size(); ++i) {
-            const auto offset = glm::vec2{0, i * cell_size};
-            r.push_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
-        }
-        for (i32 i = 1; i != board.size(); ++i) {
-            const auto offset = glm::vec2{i * cell_size, 0};
-            r.push_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
-        }
+    for (i32 i = 1; i != board.size(); ++i) {
+        const auto offset = glm::vec2{0, i * cell_size};
+        r.push_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
+    }
+    for (i32 i = 1; i != board.size(); ++i) {
+        const auto offset = glm::vec2{i * cell_size, 0};
+        r.push_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
+    }
 
-        r.push_line(tl, tr, from_hex(0xecf0f1), 2.5f);
-        r.push_line(tr, br, from_hex(0xecf0f1), 2.5f);
-        r.push_line(br, bl, from_hex(0xecf0f1), 2.5f);
-        r.push_line(bl, tl, from_hex(0xecf0f1), 2.5f);
+    r.push_line(tl, tr, from_hex(0xecf0f1), 2.5f);
+    r.push_line(tr, br, from_hex(0xecf0f1), 2.5f);
+    r.push_line(br, bl, from_hex(0xecf0f1), 2.5f);
+    r.push_line(bl, tl, from_hex(0xecf0f1), 2.5f);
 
-        // draw regions
-        for (i32 x = 0; x != board.size(); ++x) {
-            for (i32 y = 0; y != board.size(); ++y) {
-                if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
-                    const auto a = tl + cell_size * glm::vec2{x + 1, y};
-                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                    r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
-                }
+    // draw regions
+    for (i32 x = 0; x != board.size(); ++x) {
+        for (i32 y = 0; y != board.size(); ++y) {
+            if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
+                const auto a = tl + cell_size * glm::vec2{x + 1, y};
+                const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
+                r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
+            }
 
-                if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
-                    const auto a = tl + cell_size * glm::vec2{x,     y + 1};
-                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                    r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
-                }
+            if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
+                const auto a = tl + cell_size * glm::vec2{x,     y + 1};
+                const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
+                r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
             }
         }
+    }
 }
 
 }

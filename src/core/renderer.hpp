@@ -83,8 +83,6 @@ public:
     void push_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius);
     void push_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour);
     void push_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour);
-
-    void cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height);
 };
 
 }

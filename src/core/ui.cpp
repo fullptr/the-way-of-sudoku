@@ -10,15 +10,6 @@
 #include <print>
 
 namespace sudoku {
-namespace {
-    
-auto is_in_region(glm::vec2 pos, glm::vec2 top_left, f32 width, f32 height) -> bool
-{
-    return top_left.x <= pos.x && pos.x < top_left.x + width
-        && top_left.y <= pos.y && pos.y < top_left.y + height;
-}
-
-}
 
 ui_engine::ui_engine(renderer* renderer)
     : d_renderer{renderer}
