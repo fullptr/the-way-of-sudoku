@@ -20,7 +20,7 @@ auto is_in_region(glm::vec2 pos, glm::vec2 top_left, f32 width, f32 height) -> b
 
 }
 
-ui_engine::ui_engine(shape_renderer* renderer)
+ui_engine::ui_engine(renderer* renderer)
     : d_renderer{renderer}
 {
 }
@@ -143,24 +143,6 @@ void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size, glm::ve
 void ui_engine::text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
 {
     d_renderer->push_text_box(message, pos, width, height, scale, colour);
-}
-
-void ui_engine::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height)
-{
-    constexpr auto colour_fixed = from_hex(0xecf0f1);
-    constexpr auto colour_added = from_hex(0x1abc9c);
-
-    auto cell_centre = pos;
-    cell_centre.x += width / 2;
-    cell_centre.y += height / 2;
-    box_centred(cell_centre, width, height, {static_cast<u64>(10 * coord.x + coord.y)});
-    if (cell.value.has_value()) {
-        if (cell.fixed) {
-            text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_fixed);
-        } else {
-            text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_added);
-        }
-    }
 }
 
 }

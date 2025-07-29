@@ -91,6 +91,62 @@ auto check_solution(const sudoku_board& board) -> bool
     return true;
 }
 
+auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board) -> void
+{
+    const auto board_size = 0.9f * std::min(w.width(), w.height());
+        const auto cell_size = board_size / board.size();
+
+        auto top_left = glm::ivec2{w.width() / 2, w.height() / 2};
+        top_left.x -= board_size / 2;
+        top_left.y -= board_size / 2;
+
+        for (int y = 0; y != board.size(); ++y) {
+            for (int x = 0; x != board.size(); ++x) {
+                auto cell_top_left = top_left;
+                cell_top_left.x += x * cell_size;
+                cell_top_left.y += y * cell_size;
+                r.cell(board.at(x, y), {x, y}, cell_top_left, cell_size, cell_size);
+            }
+        }
+
+        // draw boundary
+        const auto tl = glm::vec2{top_left};
+        const auto tr = glm::vec2{top_left} + glm::vec2{board_size, 0};
+        const auto bl = glm::vec2{top_left} + glm::vec2{0, board_size};
+        const auto br = glm::vec2{top_left} + glm::vec2{board_size, board_size};
+
+        for (i32 i = 1; i != board.size(); ++i) {
+            const auto offset = glm::vec2{0, i * cell_size};
+            r.push_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
+        }
+        for (i32 i = 1; i != board.size(); ++i) {
+            const auto offset = glm::vec2{i * cell_size, 0};
+            r.push_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
+        }
+
+        r.push_line(tl, tr, from_hex(0xecf0f1), 2.5f);
+        r.push_line(tr, br, from_hex(0xecf0f1), 2.5f);
+        r.push_line(br, bl, from_hex(0xecf0f1), 2.5f);
+        r.push_line(bl, tl, from_hex(0xecf0f1), 2.5f);
+
+        // draw regions
+        for (i32 x = 0; x != board.size(); ++x) {
+            for (i32 y = 0; y != board.size(); ++y) {
+                if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
+                    const auto a = tl + cell_size * glm::vec2{x + 1, y};
+                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
+                    r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
+                }
+
+                if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
+                    const auto a = tl + cell_size * glm::vec2{x,     y + 1};
+                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
+                    r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
+                }
+            }
+        }
+}
+
 }
 
 
@@ -98,7 +154,7 @@ auto scene_main_menu(sudoku::window& window) -> next_state
 {
     using namespace sudoku;
     auto timer = sudoku::timer{};
-    auto shapes = sudoku::shape_renderer{};
+    auto shapes = sudoku::renderer{};
     auto ui    = sudoku::ui_engine{&shapes};
 
     while (window.is_running()) {
@@ -152,7 +208,7 @@ auto scene_game(sudoku::window& window) -> next_state
 {
     using namespace sudoku;
     auto timer = sudoku::timer{};
-    auto shapes = sudoku::shape_renderer{};
+    auto shapes = sudoku::renderer{};
     auto ui    = sudoku::ui_engine{&shapes};
 
 #if 0
@@ -248,58 +304,7 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        const auto board_size = 0.9f * std::min(window.width(), window.height());
-        const auto cell_size = board_size / board.size();
-
-        auto top_left = glm::ivec2{window.width() / 2, window.height() / 2};
-        top_left.x -= board_size / 2;
-        top_left.y -= board_size / 2;
-
-        for (int y = 0; y != board.size(); ++y) {
-            for (int x = 0; x != board.size(); ++x) {
-                auto cell_top_left = top_left;
-                cell_top_left.x += x * cell_size;
-                cell_top_left.y += y * cell_size;
-                ui.cell(board.at(x, y), {x, y}, cell_top_left, cell_size, cell_size);
-            }
-        }
-
-        // draw boundary
-        const auto tl = glm::vec2{top_left};
-        const auto tr = glm::vec2{top_left} + glm::vec2{board_size, 0};
-        const auto bl = glm::vec2{top_left} + glm::vec2{0, board_size};
-        const auto br = glm::vec2{top_left} + glm::vec2{board_size, board_size};
-
-        for (i32 i = 1; i != board.size(); ++i) {
-            const auto offset = glm::vec2{0, i * cell_size};
-            shapes.push_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
-        }
-        for (i32 i = 1; i != board.size(); ++i) {
-            const auto offset = glm::vec2{i * cell_size, 0};
-            shapes.push_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
-        }
-
-        shapes.push_line(tl, tr, from_hex(0xecf0f1), 2.5f);
-        shapes.push_line(tr, br, from_hex(0xecf0f1), 2.5f);
-        shapes.push_line(br, bl, from_hex(0xecf0f1), 2.5f);
-        shapes.push_line(bl, tl, from_hex(0xecf0f1), 2.5f);
-
-        // draw regions
-        for (i32 x = 0; x != board.size(); ++x) {
-            for (i32 y = 0; y != board.size(); ++y) {
-                if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
-                    const auto a = tl + cell_size * glm::vec2{x + 1, y};
-                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                    shapes.push_line(a, b, from_hex(0xecf0f1), 2.5f);
-                }
-
-                if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
-                    const auto a = tl + cell_size * glm::vec2{x,     y + 1};
-                    const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                    shapes.push_line(a, b, from_hex(0xecf0f1), 2.5f);
-                }
-            }
-        }
+        draw_sudoku_board(shapes, window, board);
 
         ui.end_frame(dt);
 

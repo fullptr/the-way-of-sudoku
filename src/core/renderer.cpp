@@ -405,7 +405,7 @@ void quad::set_buffer_attributes(std::uint32_t vbo)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-shape_renderer::shape_renderer()
+renderer::renderer()
     : d_line_shader(line_vertex, line_fragment)
     , d_circle_shader(circle_vertex, circle_fragment)
     , d_quad_shader(quad_vertex, quad_fragment)
@@ -432,14 +432,14 @@ shape_renderer::shape_renderer()
     d_quad_shader.load_sampler("u_texture", 0);
 }
 
-shape_renderer::~shape_renderer()
+renderer::~renderer()
 {
     glDeleteBuffers(1, &d_ebo);
     glDeleteBuffers(1, &d_vbo);
     glDeleteVertexArrays(1, &d_vao);
 }
 
-void shape_renderer::draw(i32 screen_width, i32 screen_height)
+void renderer::draw(i32 screen_width, i32 screen_height)
 {
     // TODO: Merge with the rest
     {
@@ -492,37 +492,37 @@ void shape_renderer::draw(i32 screen_width, i32 screen_height)
     d_circles.clear();
 }
 
-void shape_renderer::push_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour)
+void renderer::push_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour)
 {
     d_quads.emplace_back(top_left, width, height, 0.0f, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
 }
 
-void shape_renderer::push_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour)
+void renderer::push_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour)
 {
     d_quads.emplace_back(centre - glm::vec2{width/2, height/2}, width, height, angle, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
 }
 
-void shape_renderer::push_line(glm::vec2 begin, glm::vec2 end, glm::vec4 begin_colour, glm::vec4 end_colour, float thickness)
+void renderer::push_line(glm::vec2 begin, glm::vec2 end, glm::vec4 begin_colour, glm::vec4 end_colour, float thickness)
 {
     d_lines.emplace_back(begin, end, begin_colour, end_colour, thickness);
 }
 
-void shape_renderer::push_line(glm::vec2 begin, glm::vec2 end, glm::vec4 colour, float thickness)
+void renderer::push_line(glm::vec2 begin, glm::vec2 end, glm::vec4 colour, float thickness)
 {
     d_lines.emplace_back(begin, end, colour, colour, thickness);
 }
 
-void shape_renderer::push_circle(glm::vec2 centre, glm::vec4 colour, float radius)
+void renderer::push_circle(glm::vec2 centre, glm::vec4 colour, float radius)
 {
     d_circles.emplace_back(centre, 0.0f, radius, colour, colour, 0.0f);
 }
 
-void shape_renderer::push_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius)
+void renderer::push_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius)
 {
     d_circles.emplace_back(centre, inner_radius, outer_radius, colour, colour, 0.0f);
 }
 
-void shape_renderer::push_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour)
+void renderer::push_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour)
 {
     for (char c : message) {
         const auto ch = d_atlas.get_character(c);
@@ -541,13 +541,34 @@ void shape_renderer::push_text(std::string_view message, glm::ivec2 pos, i32 siz
     }
 }
 
-void shape_renderer::push_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
+void renderer::push_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
 {
     if (message.empty()) return;
     auto text_pos = pos;
     text_pos.x += (width - d_atlas.length_of(message) * scale) / 2;
     text_pos.y += (height + d_atlas.height * scale) / 2;
     push_text(message, text_pos, scale, colour);
+}
+
+void renderer::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height)
+{
+    constexpr auto colour_fixed = from_hex(0xecf0f1);
+    constexpr auto colour_added = from_hex(0x1abc9c);
+
+    constexpr auto unhovered_colour = from_hex(0x2c3e50);
+    constexpr auto hovered_colour = from_hex(0x34495e);
+
+    auto cell_centre = pos;
+    cell_centre.x += width / 2;
+    cell_centre.y += height / 2;
+    push_quad(cell_centre, width, height, 0, unhovered_colour);
+    if (cell.value.has_value()) {
+        if (cell.fixed) {
+            push_text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_fixed);
+        } else {
+            push_text_box(std::format("{}", *cell.value), pos, width, height, 6, colour_added);
+        }
+    }
 }
     
 }

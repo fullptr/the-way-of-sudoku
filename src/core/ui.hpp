@@ -84,10 +84,10 @@ struct ui_logic_quad
     auto time_unclicked(f64 now) const -> f64 { return glm::max(0.0, now - unclicked_time); }
 };
 
-class shape_renderer;
+class renderer;
 class ui_engine
 {
-    shape_renderer* d_renderer;
+    renderer* d_renderer;
     
     // Data from events
     glm::vec2 d_mouse_pos            = {-1, -1};
@@ -113,7 +113,7 @@ class ui_engine
     ui_engine& operator=(const ui_engine&) = delete;
 
 public:
-    ui_engine(shape_renderer* renderer);
+    ui_engine(renderer* renderer);
 
     // Step 1: process events
     bool on_event(const event& e);
@@ -124,8 +124,6 @@ public:
     void box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key = {});
     void text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
     void text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
-
-    void cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height);
     
     // Step 3: draw
     void end_frame(f64 dt);

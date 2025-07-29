@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "common.hpp"
 #include "font.hpp"
+#include "sudoku.hpp"
 
 #include <glm/glm.hpp>
 
@@ -48,7 +49,7 @@ struct quad
     static void set_buffer_attributes(std::uint32_t vbo);
 };
 
-class shape_renderer
+class renderer
 {
     u32 d_vao;
     u32 d_vbo;
@@ -67,8 +68,8 @@ class shape_renderer
     font_atlas d_atlas;
 
 public:
-    shape_renderer();
-    ~shape_renderer();
+    renderer();
+    ~renderer();
 
     // Renders all queued up geometry
     void draw(i32 screen_width, i32 screen_height);
@@ -82,6 +83,8 @@ public:
     void push_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius);
     void push_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour);
     void push_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour);
+
+    void cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height);
 };
 
 }
