@@ -80,8 +80,6 @@ public:
     void draw_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius);
     void draw_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour);
     void draw_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour);
-
-    auto submit_gquad(const quad& quad) { d_quads.push_back(quad); }
 };
 
 }
