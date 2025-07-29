@@ -181,7 +181,7 @@ void main()
 }
 )SHADER";
 
-constexpr auto gquad_vertex = R"SHADER(
+constexpr auto quad_vertex = R"SHADER(
     #version 410 core
     layout (location = 0) in vec2 p_position;
     
@@ -225,7 +225,7 @@ constexpr auto gquad_vertex = R"SHADER(
     }
 )SHADER";
     
-constexpr auto gquad_fragment = R"SHADER(
+constexpr auto quad_fragment = R"SHADER(
     #version 410 core
     layout (location = 0) out vec4 out_colour;
     
@@ -356,59 +356,59 @@ auto load_pixel_font_atlas() -> font_atlas
 
 }
 
-void line_instance::set_buffer_attributes(std::uint32_t vbo)
+void line::set_buffer_attributes(std::uint32_t vbo)
 {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     for (int i = 1; i != 6; ++i) {
         glEnableVertexAttribArray(i);
         glVertexAttribDivisor(i, 1);
     }
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(line_instance), (void*)offsetof(line_instance, begin));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(line_instance), (void*)offsetof(line_instance, end));
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(line_instance), (void*)offsetof(line_instance, begin_colour));
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(line_instance), (void*)offsetof(line_instance, end_colour));
-    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(line_instance), (void*)offsetof(line_instance, thickness));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(line), (void*)offsetof(line, begin));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(line), (void*)offsetof(line, end));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(line), (void*)offsetof(line, begin_colour));
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(line), (void*)offsetof(line, end_colour));
+    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(line), (void*)offsetof(line, thickness));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void circle_instance::set_buffer_attributes(std::uint32_t vbo)
+void circle::set_buffer_attributes(std::uint32_t vbo)
 {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     for (int i = 1; i != 7; ++i) {
         glEnableVertexAttribArray(i);
         glVertexAttribDivisor(i, 1);
     }
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(circle_instance), (void*)offsetof(circle_instance, centre));
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(circle_instance), (void*)offsetof(circle_instance, inner_radius));
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(circle_instance), (void*)offsetof(circle_instance, outer_radius));
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(circle_instance), (void*)offsetof(circle_instance, begin_colour));
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(circle_instance), (void*)offsetof(circle_instance, end_colour));
-    glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(circle_instance), (void*)offsetof(circle_instance, angle));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(circle), (void*)offsetof(circle, centre));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(circle), (void*)offsetof(circle, inner_radius));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(circle), (void*)offsetof(circle, outer_radius));
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(circle), (void*)offsetof(circle, begin_colour));
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(circle), (void*)offsetof(circle, end_colour));
+    glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, sizeof(circle), (void*)offsetof(circle, angle));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void ui_graphics_quad::set_buffer_attributes(std::uint32_t vbo)
+void quad::set_buffer_attributes(std::uint32_t vbo)
 {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     for (int i = 1; i != 9; ++i) {
         glEnableVertexAttribArray(i);
         glVertexAttribDivisor(i, 1);
     }
-    glVertexAttribIPointer(1, 2, GL_INT, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, top_left));
-    glVertexAttribIPointer(2, 1, GL_INT, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, width));
-    glVertexAttribIPointer(3, 1, GL_INT, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, height));
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, angle));
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, colour));
-    glVertexAttribIPointer(6, 1, GL_INT, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, use_texture));
-    glVertexAttribIPointer(7, 2, GL_INT, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, uv_pos));
-    glVertexAttribIPointer(8, 2, GL_INT, sizeof(ui_graphics_quad), (void*)offsetof(ui_graphics_quad, uv_size));
+    glVertexAttribIPointer(1, 2, GL_INT, sizeof(quad), (void*)offsetof(quad, top_left));
+    glVertexAttribIPointer(2, 1, GL_INT, sizeof(quad), (void*)offsetof(quad, width));
+    glVertexAttribIPointer(3, 1, GL_INT, sizeof(quad), (void*)offsetof(quad, height));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(quad), (void*)offsetof(quad, angle));
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(quad), (void*)offsetof(quad, colour));
+    glVertexAttribIPointer(6, 1, GL_INT, sizeof(quad), (void*)offsetof(quad, use_texture));
+    glVertexAttribIPointer(7, 2, GL_INT, sizeof(quad), (void*)offsetof(quad, uv_pos));
+    glVertexAttribIPointer(8, 2, GL_INT, sizeof(quad), (void*)offsetof(quad, uv_size));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 shape_renderer::shape_renderer()
     : d_line_shader(line_vertex, line_fragment)
     , d_circle_shader(circle_vertex, circle_fragment)
-    , d_graphics_quad_shader(gquad_vertex, gquad_fragment)
+    , d_quad_shader(quad_vertex, quad_fragment)
     , d_atlas{load_pixel_font_atlas()}
 {
     const float vertices[] = {-1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f};
@@ -428,8 +428,8 @@ shape_renderer::shape_renderer()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
 
-    d_graphics_quad_shader.bind();
-    d_graphics_quad_shader.load_sampler("u_texture", 0);
+    d_quad_shader.bind();
+    d_quad_shader.load_sampler("u_texture", 0);
 }
 
 shape_renderer::~shape_renderer()
@@ -445,7 +445,7 @@ void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
     {
         glBindVertexArray(d_vao);
         d_atlas.texture->bind();
-        d_graphics_quad_shader.load_int("u_use_texture", 1);
+        d_quad_shader.load_int("u_use_texture", 1);
     
         glEnable(GL_BLEND);
         glBlendEquation(GL_FUNC_ADD);
@@ -454,14 +454,14 @@ void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
         const auto dimensions = glm::vec2{screen_width, screen_height};
         const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
         
-        d_graphics_quad_shader.bind();
-        d_graphics_quad_shader.load_mat4("u_proj_matrix", projection);
-        d_instances.bind<ui_graphics_quad>(d_gquads);
-        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_gquads.size());
+        d_quad_shader.bind();
+        d_quad_shader.load_mat4("u_proj_matrix", projection);
+        d_instances.bind<quad>(d_quads);
+        glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_quads.size());
     
         glDisable(GL_BLEND);
     
-        d_gquads.clear();
+        d_quads.clear();
     }
 
     glBindVertexArray(d_vao);
@@ -480,11 +480,11 @@ void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
     const auto projection = glm::ortho(0.0f, dimensions.x, dimensions.y, 0.0f);
 
     d_line_shader.bind();
-    d_instances.bind<line_instance>(d_lines);
+    d_instances.bind<line>(d_lines);
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_lines.size());
 
     d_circle_shader.bind();
-    d_instances.bind<circle_instance>(d_circles);
+    d_instances.bind<circle>(d_circles);
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr, (int)d_circles.size());
 
     glDisable(GL_BLEND);
@@ -494,12 +494,12 @@ void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
 
 void shape_renderer::draw_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour)
 {
-    d_gquads.emplace_back(top_left, width, height, 0.0f, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
+    d_quads.emplace_back(top_left, width, height, 0.0f, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
 }
 
 void shape_renderer::draw_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour)
 {
-    d_gquads.emplace_back(centre - glm::vec2{width/2, height/2}, width, height, angle, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
+    d_quads.emplace_back(centre - glm::vec2{width/2, height/2}, width, height, angle, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
 }
 
 void shape_renderer::draw_line(glm::vec2 begin, glm::vec2 end, glm::vec4 begin_colour, glm::vec4 end_colour, float thickness)
@@ -527,7 +527,7 @@ void shape_renderer::draw_text(std::string_view message, glm::ivec2 pos, i32 siz
     for (char c : message) {
         const auto ch = d_atlas.get_character(c);
 
-        const auto quad = ui_graphics_quad{
+        const auto q = quad{
             pos + (size * ch.bearing),
             size * ch.size.x,
             size * ch.size.y,
@@ -537,7 +537,7 @@ void shape_renderer::draw_text(std::string_view message, glm::ivec2 pos, i32 siz
             ch.position,
             ch.size
         };
-        d_gquads.push_back(quad);
+        d_quads.push_back(q);
         pos.x += size * ch.advance;
     }
 }

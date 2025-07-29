@@ -107,8 +107,7 @@ bool ui_engine::button(
         colour = sudoku::lerp(hovered_colour, unhovered_colour, t);
     }
     
-    const auto quad = ui_graphics_quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}};
-    d_renderer->submit_gquad(quad);
+    d_renderer->submit_gquad(quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}});
     d_renderer->draw_text_box(msg, pos, width, height, scale, from_hex(0xecf0f1));
     return data.clicked_this_frame;
 }
@@ -124,8 +123,7 @@ void ui_engine::box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key
         colour = hovered_colour;
     }
     
-    const auto quad = ui_graphics_quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}};
-    d_renderer->submit_gquad(quad);
+    d_renderer->submit_gquad(quad{pos, width, height, 0.0f, colour, 0, {0, 0}, {0, 0}});
 }
 
 void ui_engine::box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key) {
