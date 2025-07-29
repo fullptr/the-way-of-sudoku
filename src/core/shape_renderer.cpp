@@ -564,12 +564,12 @@ void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
 
 void shape_renderer::draw_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour)
 {
-    d_quads.emplace_back(top_left, width, height, 0.0f, colour);
+    d_gquads.emplace_back(top_left, width, height, 0.0f, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
 }
 
 void shape_renderer::draw_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour)
 {
-    d_quads.emplace_back(centre - glm::vec2{width/2, height/2}, width, height, angle, colour);
+    d_gquads.emplace_back(centre - glm::vec2{width/2, height/2}, width, height, angle, colour, false, glm::ivec2{0, 0}, glm::ivec2{0, 0});
 }
 
 void shape_renderer::draw_line(glm::vec2 begin, glm::vec2 end, glm::vec4 begin_colour, glm::vec4 end_colour, float thickness)
