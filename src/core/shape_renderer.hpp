@@ -36,7 +36,7 @@ struct circle_instance
 
 struct quad_instance
 {
-    glm::vec2 centre;
+    glm::vec2 top_left;
     float     width;
     float     height;
     float     angle;

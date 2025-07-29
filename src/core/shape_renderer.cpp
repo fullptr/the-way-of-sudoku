@@ -185,7 +185,7 @@ constexpr auto quad_vertex = R"SHADER(
 #version 410 core
 layout (location = 0) in vec2 p_position;
 
-layout (location = 1) in vec2  quad_centre;
+layout (location = 1) in vec2  quad_top_left;
 layout (location = 2) in float quad_width;
 layout (location = 3) in float quad_height;
 layout (location = 4) in float quad_angle;
@@ -204,8 +204,8 @@ mat2 rotate(float theta)
 
 void main()
 {
-    vec2 position = quad_centre;
     vec2 dimensions = vec2(quad_width, quad_height) / 2;
+    vec2 position = quad_top_left + dimensions / 2;
 
     vec2 screen_position = rotate(quad_angle) * (p_position * dimensions) + position;
 
@@ -440,7 +440,7 @@ void quad_instance::set_buffer_attributes(std::uint32_t vbo)
         glEnableVertexAttribArray(i);
         glVertexAttribDivisor(i, 1);
     }
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, centre));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, top_left));
     glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, width));
     glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, height));
     glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(quad_instance), (void*)offsetof(quad_instance, angle));
@@ -564,12 +564,12 @@ void shape_renderer::draw_frame(i32 screen_width, i32 screen_height)
 
 void shape_renderer::draw_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour)
 {
-    d_quads.emplace_back(top_left + glm::vec2{width/2, height/2}, width, height, 0.0f, colour);
+    d_quads.emplace_back(top_left, width, height, 0.0f, colour);
 }
 
 void shape_renderer::draw_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour)
 {
-    d_quads.emplace_back(centre, width, height, angle, colour);
+    d_quads.emplace_back(centre - glm::vec2{width/2, height/2}, width, height, angle, colour);
 }
 
 void shape_renderer::draw_line(glm::vec2 begin, glm::vec2 end, glm::vec4 begin_colour, glm::vec4 end_colour, float thickness)
