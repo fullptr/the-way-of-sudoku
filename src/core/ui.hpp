@@ -120,11 +120,7 @@ public:
 
     // Step 2: setup ui elements    
     bool button(std::string_view msg, glm::ivec2 pos, i32 width, i32 height, i32 scale, const widget_key& key = {});
-    void box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key = {});
-    void box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key = {});
-    void text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
-    void text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
-    
+
     // Step 3: draw
     void end_frame(f64 dt);
 };
