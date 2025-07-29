@@ -148,4 +148,10 @@ const T& signed_index(const std::vector<T>& v, int index)
     return v[index];
 }
 
+inline auto is_in_region(glm::vec2 pos, glm::vec2 top_left, f32 width, f32 height) -> bool
+{
+    return top_left.x <= pos.x && pos.x < top_left.x + width
+        && top_left.y <= pos.y && pos.y < top_left.y + height;
+}
+
 }

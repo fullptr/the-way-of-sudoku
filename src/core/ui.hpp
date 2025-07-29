@@ -5,6 +5,7 @@
 #include "event.hpp"
 #include "sudoku.hpp"
 #include "utility.hpp"
+#include "font.hpp"
 #include "common.hpp"
 
 #include <array>
@@ -57,43 +58,6 @@ struct std::hash<sudoku::widget_key>
 
 namespace sudoku {
 
-struct character
-{
-    glm::ivec2 position;
-    glm::ivec2 size;
-    glm::ivec2 bearing;
-    i32        advance;
-};
-
-struct font_atlas
-{
-    std::unique_ptr<texture_png>        texture;
-    std::unordered_map<char, character> chars;
-    character                           missing_char;
-    i32                                 height; // height of an "a", used for centring
-
-    auto get_character(char c) const -> const character&;
-    auto length_of(std::string_view message) -> i32;
-};
-
-// This is just a copy of quad_instance from the shape_renderer, should
-// we combine these? I'm just making a copy now since I am assuming both will
-// iterate in different directions and I don't necessarily want them tied
-// together, but I still feel conflicted.
-struct ui_graphics_quad
-{
-    glm::ivec2 top_left;
-    int        width;
-    int        height;
-    float      angle;
-    glm::vec4  colour;
-    int        use_texture;
-    glm::ivec2 uv_pos;
-    glm::ivec2 uv_size;
-
-    static void set_buffer_attributes(std::uint32_t vbo);
-};
-
 struct ui_logic_quad
 {
     glm::vec2 top_left = {0, 0};
@@ -120,30 +84,21 @@ struct ui_logic_quad
     auto time_unclicked(f64 now) const -> f64 { return glm::max(0.0, now - unclicked_time); }
 };
 
+class renderer;
 class ui_engine
 {
-    u32 d_vao;
-    u32 d_vbo;
-    u32 d_ebo;
-
-    std::vector<ui_graphics_quad> d_quads;
-
-    shader d_shader;
-
-    vertex_buffer d_instances;
-
+    renderer* d_renderer;
+    
     // Data from events
-    glm::vec2 d_mouse_pos            = {0, 0};
+    glm::vec2 d_mouse_pos            = {-1, -1};
     bool      d_clicked_this_frame   = false;
     bool      d_unclicked_this_frame = false;
     
     // Data from update
     f64       d_time                 = 0.0;
     bool      d_capture_mouse        = false;
-
+    
     std::unordered_map<widget_key, ui_logic_quad> d_data;
-
-    font_atlas d_atlas;
 
     const ui_logic_quad& get_data(const widget_key& key, glm::vec2 top_left, f32 width, f32 height) { 
         auto& data = d_data[key];
@@ -158,23 +113,16 @@ class ui_engine
     ui_engine& operator=(const ui_engine&) = delete;
 
 public:
-    ui_engine();
-    ~ui_engine();
+    ui_engine(renderer* renderer);
 
     // Step 1: process events
     bool on_event(const event& e);
 
     // Step 2: setup ui elements    
     bool button(std::string_view msg, glm::ivec2 pos, i32 width, i32 height, i32 scale, const widget_key& key = {});
-    void box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key = {});
-    void box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key = {});
-    void text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
-    void text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 size, glm::vec4 colour = from_hex(0xecf0f1));
 
-    void cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height);
-    
     // Step 3: draw
-    void draw_frame(i32 screen_width, i32 screen_height, f64 dt);
+    void end_frame(f64 dt);
 };
 
 }

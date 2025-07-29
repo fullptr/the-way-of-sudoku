@@ -6,10 +6,11 @@ find_package(glm CONFIG REQUIRED)
 
 add_library(core STATIC
     buffer.cpp
-    shape_renderer.cpp
+    renderer.cpp
     window.cpp
     shader.cpp
     texture.cpp
+    font.cpp
     utility.cpp
     input.cpp
     ui.cpp
