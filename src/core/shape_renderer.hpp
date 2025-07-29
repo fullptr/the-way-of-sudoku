@@ -70,16 +70,18 @@ public:
     shape_renderer();
     ~shape_renderer();
 
-    void draw_frame(i32 screen_width, i32 screen_height);
+    // Renders all queued up geometry
+    void draw(i32 screen_width, i32 screen_height);
 
-    void draw_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour);
-    void draw_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour);
-    void draw_line(glm::vec2 begin, glm::vec2 end, glm::vec4 begin_colour, glm::vec4 end_colour, float thickness);
-    void draw_line(glm::vec2 begin, glm::vec2 end, glm::vec4 colour, float thickness);
-    void draw_circle(glm::vec2 centre, glm::vec4 colour, float radius);
-    void draw_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius);
-    void draw_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour);
-    void draw_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour);
+    // Queues up geometry to render
+    void push_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour);
+    void push_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour);
+    void push_line(glm::vec2 begin, glm::vec2 end, glm::vec4 begin_colour, glm::vec4 end_colour, float thickness);
+    void push_line(glm::vec2 begin, glm::vec2 end, glm::vec4 colour, float thickness);
+    void push_circle(glm::vec2 centre, glm::vec4 colour, float radius);
+    void push_annulus(glm::vec2 centre, glm::vec4 colour, float inner_radius, float outer_radius);
+    void push_text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour);
+    void push_text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour);
 };
 
 }

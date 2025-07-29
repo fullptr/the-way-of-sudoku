@@ -107,8 +107,8 @@ bool ui_engine::button(
         colour = sudoku::lerp(hovered_colour, unhovered_colour, t);
     }
     
-    d_renderer->draw_rect(pos, width, height, colour);
-    d_renderer->draw_text_box(msg, pos, width, height, scale, from_hex(0xecf0f1));
+    d_renderer->push_rect(pos, width, height, colour);
+    d_renderer->push_text_box(msg, pos, width, height, scale, from_hex(0xecf0f1));
     return data.clicked_this_frame;
 }
 
@@ -123,7 +123,7 @@ void ui_engine::box(glm::ivec2 pos, i32 width, i32 height, const widget_key& key
         colour = hovered_colour;
     }
     
-    d_renderer->draw_rect(pos, width, height, colour);
+    d_renderer->push_rect(pos, width, height, colour);
 }
 
 void ui_engine::box_centred(glm::ivec2 centre, i32 width, i32 height, const widget_key& key) {
@@ -135,12 +135,12 @@ void ui_engine::box_centred(glm::ivec2 centre, i32 width, i32 height, const widg
 
 void ui_engine::text(std::string_view message, glm::ivec2 pos, i32 size, glm::vec4 colour)
 {
-    d_renderer->draw_text(message, pos, size, colour);
+    d_renderer->push_text(message, pos, size, colour);
 }
 
 void ui_engine::text_box(std::string_view message, glm::ivec2 pos, i32 width, i32 height, i32 scale, glm::vec4 colour)
 {
-    d_renderer->draw_text_box(message, pos, width, height, scale, colour);
+    d_renderer->push_text_box(message, pos, width, height, scale, colour);
 }
 
 void ui_engine::cell(const sudoku_cell& cell, glm::ivec2 coord, glm::ivec2 pos, i32 width, i32 height)

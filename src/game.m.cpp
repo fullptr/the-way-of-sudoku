@@ -141,7 +141,7 @@ auto scene_main_menu(sudoku::window& window) -> next_state
         ui.text_box(sudoku::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3);
         ui.end_frame(dt);
 
-        shapes.draw_frame(window.width(), window.height());
+        shapes.draw(window.width(), window.height());
         window.end_frame();
     }
 
@@ -272,17 +272,17 @@ auto scene_game(sudoku::window& window) -> next_state
 
         for (i32 i = 1; i != board.size(); ++i) {
             const auto offset = glm::vec2{0, i * cell_size};
-            shapes.draw_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
+            shapes.push_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
         }
         for (i32 i = 1; i != board.size(); ++i) {
             const auto offset = glm::vec2{i * cell_size, 0};
-            shapes.draw_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
+            shapes.push_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
         }
 
-        shapes.draw_line(tl, tr, from_hex(0xecf0f1), 2.5f);
-        shapes.draw_line(tr, br, from_hex(0xecf0f1), 2.5f);
-        shapes.draw_line(br, bl, from_hex(0xecf0f1), 2.5f);
-        shapes.draw_line(bl, tl, from_hex(0xecf0f1), 2.5f);
+        shapes.push_line(tl, tr, from_hex(0xecf0f1), 2.5f);
+        shapes.push_line(tr, br, from_hex(0xecf0f1), 2.5f);
+        shapes.push_line(br, bl, from_hex(0xecf0f1), 2.5f);
+        shapes.push_line(bl, tl, from_hex(0xecf0f1), 2.5f);
 
         // draw regions
         for (i32 x = 0; x != board.size(); ++x) {
@@ -290,20 +290,20 @@ auto scene_game(sudoku::window& window) -> next_state
                 if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
                     const auto a = tl + cell_size * glm::vec2{x + 1, y};
                     const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.5f);
+                    shapes.push_line(a, b, from_hex(0xecf0f1), 2.5f);
                 }
 
                 if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
                     const auto a = tl + cell_size * glm::vec2{x,     y + 1};
                     const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                    shapes.draw_line(a, b, from_hex(0xecf0f1), 2.5f);
+                    shapes.push_line(a, b, from_hex(0xecf0f1), 2.5f);
                 }
             }
         }
 
         ui.end_frame(dt);
 
-        shapes.draw_frame(window.width(), window.height());
+        shapes.draw(window.width(), window.height());
         window.end_frame();
     }
 
