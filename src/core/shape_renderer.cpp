@@ -527,7 +527,7 @@ void shape_renderer::push_text(std::string_view message, glm::ivec2 pos, i32 siz
     for (char c : message) {
         const auto ch = d_atlas.get_character(c);
 
-        const auto q = quad{
+        d_quads.push_back(quad{
             pos + (size * ch.bearing),
             size * ch.size.x,
             size * ch.size.y,
@@ -536,8 +536,7 @@ void shape_renderer::push_text(std::string_view message, glm::ivec2 pos, i32 siz
             1,
             ch.position,
             ch.size
-        };
-        d_quads.push_back(q);
+        });
         pos.x += size * ch.advance;
     }
 }
