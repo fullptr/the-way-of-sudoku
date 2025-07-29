@@ -1,4 +1,4 @@
-#include "shape_renderer.hpp"
+#include "renderer.hpp"
 #include "font.hpp"
 
 #include <glad/glad.h>

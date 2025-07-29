@@ -2,7 +2,7 @@
 #include "input.hpp"
 #include "window.hpp"
 #include "utility.hpp"
-#include "shape_renderer.hpp"
+#include "renderer.hpp"
 #include "ui.hpp"
 #include "sudoku.hpp"
 

@@ -1,9 +1,8 @@
 #include "ui.hpp"
 #include "common.hpp"
 #include "utility.hpp"
-#include "shape_renderer.hpp"
+#include "renderer.hpp"
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
