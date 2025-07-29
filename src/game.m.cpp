@@ -65,9 +65,7 @@ auto check_solution(const sudoku_board& board) -> std::optional<bad_solution>
     for (i32 row = 0; row != board.size(); ++row) {
         for (i32 col = 0; col != board.size(); ++col) {
             const auto val = board.at(row, col).value;
-            if (!val.has_value()) {
-                sol.empty_cells.insert(glm::ivec2{row, col});
-            }
+            if (!val.has_value()) sol.empty_cells.insert(glm::ivec2{row, col});
         }
     }
     if (!sol.empty_cells.empty()) { // bad solution because the board isn't filled
@@ -110,7 +108,7 @@ auto check_solution(const sudoku_board& board) -> std::optional<bad_solution>
     return std::nullopt;
 }
 
-auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board) -> void
+auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board, const std::optional<bad_solution>& sol) -> void
 {
     constexpr auto colour_given_digits = from_hex(0xecf0f1);
     constexpr auto colour_added_digits = from_hex(0x1abc9c);
@@ -136,7 +134,10 @@ auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board) 
             cell_centre.y += cell_size / 2;
 
             const auto highlighted = is_in_region(w.mouse_pos(), cell_top_left, cell_size, cell_size);
-            const auto cell_colour = highlighted ? colour_cell_hightlighted : colour_cell;
+            auto cell_colour = highlighted ? colour_cell_hightlighted : colour_cell;
+            if (sol.has_value() && sol->empty_cells.contains(glm::ivec2{x, y})) {
+                cell_colour = from_hex(0xc0392b);
+            }
             r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
 
             const auto& cell = board.at(x, y);
@@ -250,6 +251,10 @@ auto scene_game(sudoku::window& window) -> next_state
     auto shapes = sudoku::renderer{};
     auto ui    = sudoku::ui_engine{&shapes};
 
+    auto solution = std::optional<bad_solution>{};
+    auto counter = 0.0;
+    auto solve_time = 0.0;
+
 #if 0
     auto board = make_board(
         {
@@ -300,6 +305,11 @@ auto scene_game(sudoku::window& window) -> next_state
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
 
+        counter += dt;
+        if (solution.has_value() && counter - solve_time > 5.0) {
+            solution = {};
+        }
+
         for (const auto event : window.events()) {
             ui.on_event(event);
 
@@ -335,15 +345,17 @@ auto scene_game(sudoku::window& window) -> next_state
         }
 
         if (ui.button("Check Solution", {0, 55}, 200, 50, 3)) {
-            const auto success =  check_solution(board);
+            const auto success = check_solution(board);
+            solution = success;
             if (!success.has_value()) {
                 std::print("solved!\n");
             } else {
+                solve_time = counter;
                 std::print("bad!\n");
             }
         }
 
-        draw_sudoku_board(shapes, window, board);
+        draw_sudoku_board(shapes, window, board, solution);
 
         ui.end_frame(dt);
 
