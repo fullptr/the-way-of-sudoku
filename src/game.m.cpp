@@ -184,8 +184,8 @@ auto draw_sudoku_board(
                         scale  = 1;
                     }
                     auto pos = cell_top_left;
-                    pos.x += (i32)(cell_size * 0.05f);
-                    pos.y += (i32)(cell_size * 0.05f) + r.font().height * scale;
+                    pos.x += (i32)(cell_size * 0.1f);
+                    pos.y += (i32)(cell_size * 0.1f) + r.font().height * scale;
                     r.push_text(s, pos, scale, colour);
                 }
 
