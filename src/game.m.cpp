@@ -54,12 +54,14 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
 
 struct bad_solution
 {
+    time_point solve_time;
     std::unordered_set<glm::ivec2> empty_cells;
 };
 
-auto check_solution(const sudoku_board& board) -> std::optional<bad_solution>
+auto check_solution(const sudoku_board& board, time_point time) -> std::optional<bad_solution>
 {
     auto sol = bad_solution{};
+    sol.solve_time = time;
 
     // check for empty cells
     for (i32 row = 0; row != board.size(); ++row) {
@@ -252,8 +254,6 @@ auto scene_game(sudoku::window& window) -> next_state
     auto ui    = sudoku::ui_engine{&shapes};
 
     auto solution = std::optional<bad_solution>{};
-    auto counter = 0.0;
-    auto solve_time = 0.0;
 
 #if 0
     auto board = make_board(
@@ -305,8 +305,7 @@ auto scene_game(sudoku::window& window) -> next_state
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
 
-        counter += dt;
-        if (solution.has_value() && counter - solve_time > 5.0) {
+        if (solution.has_value() && timer.now() - solution->solve_time > 1s) {
             solution = {};
         }
 
@@ -345,12 +344,11 @@ auto scene_game(sudoku::window& window) -> next_state
         }
 
         if (ui.button("Check Solution", {0, 55}, 200, 50, 3)) {
-            const auto success = check_solution(board);
+            const auto success = check_solution(board, timer.now());
             solution = success;
             if (!success.has_value()) {
                 std::print("solved!\n");
             } else {
-                solve_time = counter;
                 std::print("bad!\n");
             }
         }
