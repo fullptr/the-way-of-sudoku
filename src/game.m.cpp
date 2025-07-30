@@ -263,7 +263,8 @@ auto scene_game(sudoku::window& window) -> next_state
 
     auto solution = std::optional<bad_solution>{};
 
-#if 0
+#define LEVEL 2
+#if LEVEL == 0
     auto board = make_board(
         {
             "2..91.568",
@@ -287,7 +288,7 @@ auto scene_game(sudoku::window& window) -> next_state
             "777888999",
         }
     );
-#else
+#elif LEVEL == 1
     auto board = make_board(
         {
             "..57341",
@@ -305,6 +306,22 @@ auto scene_game(sudoku::window& window) -> next_state
             "4455663",
             "4777666",
             "4777766",
+        }
+    );
+#elif LEVEL == 2
+    auto board = make_board(
+        {
+            ".5...",
+            "...3.",
+            "5...1",
+            ".4...",
+            "...5."
+        }, {
+            "11112",
+            "13442",
+            "33442",
+            "33422",
+            "55555"
         }
     );
 #endif
@@ -347,7 +364,6 @@ auto scene_game(sudoku::window& window) -> next_state
         }
 
         if (ui.button("Back", {0, 0}, 200, 50, 3)) {
-            std::print("exiting!\n");
             return next_state::main_menu;
         }
 
