@@ -154,6 +154,13 @@ auto draw_sudoku_board(
             if (cell.value.has_value()) {
                 const auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, cell_size, cell_size, 6, colour);
+            } else if (!cell.centre_pencil_marks.empty()) {
+                const auto colour = colour_added_digits;
+                auto s = std::string{};
+                for (auto mark : cell.centre_pencil_marks) {
+                    s.append(std::to_string(mark));
+                }
+                r.push_text_box(s, cell_top_left, cell_size, cell_size, 2, colour);
             }
         }
     }
@@ -260,10 +267,11 @@ auto scene_game(sudoku::window& window) -> next_state
     auto timer = sudoku::timer{};
     auto shapes = sudoku::renderer{};
     auto ui    = sudoku::ui_engine{&shapes};
+    auto input = sudoku::input{};
 
     auto solution = std::optional<bad_solution>{};
 
-#define LEVEL 2
+#define LEVEL 0
 #if LEVEL == 0
     auto board = make_board(
         {
@@ -329,6 +337,7 @@ auto scene_game(sudoku::window& window) -> next_state
     while (window.is_running()) {
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
+        input.on_new_frame();
 
         if (solution.has_value() && timer.now() - solution->solve_time > 1s) {
             solution = {};
@@ -336,6 +345,7 @@ auto scene_game(sudoku::window& window) -> next_state
 
         for (const auto event : window.events()) {
             ui.on_event(event);
+            input.on_event(event);
 
             if (auto e = event.get_if<keyboard_pressed_event>()) {
                 if (auto cell = hovered_cell(board, window); cell && !cell->fixed) {
@@ -353,10 +363,22 @@ auto scene_game(sudoku::window& window) -> next_state
                         case keyboard::backspace: value = -1; break;
                     }
                     if (value) {
-                        if (*value == -1) {
-                            cell->value = {};
-                        } else if (*value <= board.size()) {
-                            cell->value = *value;
+                        if (e->mods & modifier::shift) {
+                            if (*value == -1) {
+                                cell->centre_pencil_marks.clear();
+                            } else if (*value <= board.size()) {
+                                if (cell->centre_pencil_marks.contains(*value)) {
+                                    cell->centre_pencil_marks.erase(*value);
+                                } else {
+                                    cell->centre_pencil_marks.insert(*value);
+                                }
+                            }
+                        } else {
+                            if (*value == -1) {
+                                cell->value = {};
+                            } else if (*value <= board.size()) {
+                                cell->value = *value;
+                            }
                         }
                     }
                 }

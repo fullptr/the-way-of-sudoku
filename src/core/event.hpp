@@ -28,6 +28,13 @@ enum class keyboard
 	num_0 = 48, num_1, num_2, num_3, num_4, num_5, num_6, num_7, num_8, num_9,
 };
 
+enum modifier // not an enum class because they can be | together
+{
+	shift = 1 << 0,
+	ctrl  = 1 << 1,
+	alt   = 1 << 2
+};
+
 // KEYBOARD EVENTS 
 struct keyboard_pressed_event {
 	keyboard key;
