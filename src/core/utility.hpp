@@ -69,14 +69,14 @@ auto coin_flip() -> bool;
 auto sign_flip() -> int;
 auto random_unit() -> float; // Same as random_from_range(0.0f, 1.0f)
 
-constexpr auto from_hex(int hex) -> glm::vec4
+constexpr auto from_hex(int hex, float alpha = 1.0f) -> glm::vec4
 {
     const auto blue = static_cast<float>(hex & 0xff) / 256.0f;
     hex /= 0x100;
     const auto green = static_cast<float>(hex & 0xff) / 256.0f;
     hex /= 0x100;
     const auto red = static_cast<float>(hex & 0xff) / 256.0f;
-    return glm::vec4{red, green, blue, 1.0f};
+    return glm::vec4{red, green, blue, alpha};
 }
 
 auto get_executable_filepath() -> std::filesystem::path;

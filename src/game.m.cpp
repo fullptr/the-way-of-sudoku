@@ -132,6 +132,8 @@ auto draw_sudoku_board(
     top_left.x -= board_size / 2;
     top_left.y -= board_size / 2;
 
+    r.push_rect(top_left, board_size, board_size, colour_cell);
+
     for (int y = 0; y != board.size(); ++y) {
         for (int x = 0; x != board.size(); ++x) {
             auto cell_top_left = top_left;
@@ -148,24 +150,45 @@ auto draw_sudoku_board(
                 const auto t = std::chrono::duration<double>(now - sol->solve_time).count();
                 cell_colour = lerp(from_hex(0xc0392b), cell_colour, t);
             }
-            r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
+            if (cell_colour != colour_cell) {
+                r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
+            }
 
             const auto& cell = board.at(x, y);
             if (cell.value.has_value()) {
                 const auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, cell_size, cell_size, 6, colour);
-            } else if (!cell.centre_pencil_marks.empty()) {
-                const auto colour = colour_added_digits;
-                auto s = std::string{};
-                for (auto mark : cell.centre_pencil_marks) {
-                    s.append(std::to_string(mark));
+            } else {
+                if (!cell.centre_pencil_marks.empty()) {
+                    const auto colour = colour_added_digits;
+                    auto s = std::string{};
+                    for (auto mark : cell.centre_pencil_marks) {
+                        s.append(std::to_string(mark));
+                    }
+                    auto scale = 2;
+                    auto length = scale * r.font().length_of(s);
+                    if (length > cell_size) {
+                        scale  = 1;
+                    }
+                    r.push_text_box(s, cell_top_left, cell_size, cell_size, scale, colour);
                 }
-                auto scale = 2;
-                auto length = scale * r.font().length_of(s);
-                if (length > cell_size) {
-                    scale  = 1;
+                if (!cell.corner_pencil_marks.empty()) {
+                    const auto colour = colour_added_digits;
+                    auto s = std::string{};
+                    for (auto mark : cell.corner_pencil_marks) {
+                        s.append(std::to_string(mark));
+                    }
+                    auto scale = 2;
+                    auto length = scale * r.font().length_of(s);
+                    if (length > cell_size) {
+                        scale  = 1;
+                    }
+                    auto pos = cell_top_left;
+                    pos.x += (i32)(cell_size * 0.05f);
+                    pos.y += (i32)(cell_size * 0.05f) + r.font().height * scale;
+                    r.push_text(s, pos, scale, colour);
                 }
-                r.push_text_box(s, cell_top_left, cell_size, cell_size, scale, colour);
+
             }
         }
     }
@@ -178,11 +201,11 @@ auto draw_sudoku_board(
 
     for (i32 i = 1; i != board.size(); ++i) {
         const auto offset = glm::vec2{0, i * cell_size};
-        r.push_line(tl + offset, tr + offset, from_hex(0x7f8c8d), 0.5f);
+        r.push_line(tl + offset, tr + offset, from_hex(0x34495e), 1.f);
     }
     for (i32 i = 1; i != board.size(); ++i) {
         const auto offset = glm::vec2{i * cell_size, 0};
-        r.push_line(tl + offset, bl + offset, from_hex(0x7f8c8d), 0.5f);
+        r.push_line(tl + offset, bl + offset, from_hex(0x34495e), 1.f);
     }
 
     r.push_line(tl, tr, from_hex(0xecf0f1), 2.5f);
@@ -196,13 +219,13 @@ auto draw_sudoku_board(
             if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
                 const auto a = tl + cell_size * glm::vec2{x + 1, y};
                 const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
+                r.push_line(a, b, from_hex(0xecf0f1), 1.f);
             }
 
             if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
                 const auto a = tl + cell_size * glm::vec2{x,     y + 1};
                 const auto b = tl + cell_size * glm::vec2{x + 1, y + 1};
-                r.push_line(a, b, from_hex(0xecf0f1), 2.5f);
+                r.push_line(a, b, from_hex(0xecf0f1), 1.f);
             }
         }
     }
@@ -368,7 +391,7 @@ auto scene_game(sudoku::window& window) -> next_state
                         case keyboard::backspace: value = -1; break;
                     }
                     if (value) {
-                        if (e->mods & modifier::shift) {
+                        if (e->mods & modifier::ctrl) {
                             if (*value == -1) {
                                 cell->centre_pencil_marks.clear();
                             } else if (*value <= board.size()) {
@@ -378,7 +401,19 @@ auto scene_game(sudoku::window& window) -> next_state
                                     cell->centre_pencil_marks.insert(*value);
                                 }
                             }
-                        } else {
+                        }
+                        else if (e->mods & modifier::shift) {
+                            if (*value == -1) {
+                                cell->corner_pencil_marks.clear();
+                            } else if (*value <= board.size()) {
+                                if (cell->corner_pencil_marks.contains(*value)) {
+                                    cell->corner_pencil_marks.erase(*value);
+                                } else {
+                                    cell->corner_pencil_marks.insert(*value);
+                                }
+                            }
+                        }
+                        else {
                             if (*value == -1) {
                                 cell->value = {};
                             } else if (*value <= board.size()) {

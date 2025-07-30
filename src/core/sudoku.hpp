@@ -14,7 +14,7 @@ struct sudoku_cell
     bool               fixed = false;
     std::optional<i32> region = {};
 
-    //std::string corner_pencil_marks;
+    std::set<i32> corner_pencil_marks;
     std::set<i32> centre_pencil_marks;
 };
 
