@@ -415,7 +415,13 @@ auto scene_game(sudoku::window& window) -> next_state
                         }
                         else {
                             if (*value == -1) {
-                                cell->value = {};
+                                if (cell->value.has_value()) {
+                                    cell->value = {};
+                                } else if (!cell->centre_pencil_marks.empty()) {
+                                    cell->centre_pencil_marks.clear();
+                                } else if (!cell->corner_pencil_marks.empty()) {
+                                    cell->corner_pencil_marks.clear();
+                                }
                             } else if (*value <= board.size()) {
                                 cell->value = *value;
                             }
