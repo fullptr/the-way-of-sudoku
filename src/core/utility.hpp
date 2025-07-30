@@ -30,8 +30,10 @@ struct overloaded : Ts...
 
 class timer
 {
+public:
     using clock = std::chrono::steady_clock;
 
+private:
     clock d_clock;
     clock::time_point d_prev_time;
     clock::time_point d_curr_time;
@@ -47,6 +49,9 @@ public:
 
     auto now() const -> clock::time_point;
 };
+
+using time_point = typename timer::clock::time_point;
+using namespace std::chrono_literals;
 
 auto random_from_range(float min, float max) -> float;
 auto random_from_range(int min, int max) -> int;
@@ -152,6 +157,11 @@ inline auto is_in_region(glm::vec2 pos, glm::vec2 top_left, f32 width, f32 heigh
 {
     return top_left.x <= pos.x && pos.x < top_left.x + width
         && top_left.y <= pos.y && pos.y < top_left.y + height;
+}
+
+inline auto clamp(double val, double lo, double hi) -> double
+{
+    return std::min(std::max(lo, val), hi);
 }
 
 }
