@@ -110,7 +110,14 @@ auto check_solution(const sudoku_board& board, time_point time) -> std::optional
     return std::nullopt;
 }
 
-auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board, const std::optional<bad_solution>& sol) -> void
+auto draw_sudoku_board(
+    renderer& r,
+    const window& w,
+    const sudoku_board& board,
+    const std::optional<bad_solution>& sol,
+    const time_point& now
+)
+    -> void
 {
     constexpr auto colour_given_digits = from_hex(0xecf0f1);
     constexpr auto colour_added_digits = from_hex(0x1abc9c);
@@ -138,7 +145,8 @@ auto draw_sudoku_board(renderer& r, const window& w, const sudoku_board& board, 
             const auto highlighted = is_in_region(w.mouse_pos(), cell_top_left, cell_size, cell_size);
             auto cell_colour = highlighted ? colour_cell_hightlighted : colour_cell;
             if (sol.has_value() && sol->empty_cells.contains(glm::ivec2{x, y})) {
-                cell_colour = from_hex(0xc0392b);
+                const auto t = std::chrono::duration<double>(now - sol->solve_time).count();
+                cell_colour = lerp(from_hex(0xc0392b), cell_colour, t);
             }
             r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
 
@@ -348,12 +356,10 @@ auto scene_game(sudoku::window& window) -> next_state
             solution = success;
             if (!success.has_value()) {
                 std::print("solved!\n");
-            } else {
-                std::print("bad!\n");
             }
         }
 
-        draw_sudoku_board(shapes, window, board, solution);
+        draw_sudoku_board(shapes, window, board, solution, timer.now());
 
         ui.end_frame(dt);
 

@@ -159,4 +159,9 @@ inline auto is_in_region(glm::vec2 pos, glm::vec2 top_left, f32 width, f32 heigh
         && top_left.y <= pos.y && pos.y < top_left.y + height;
 }
 
+inline auto clamp(double val, double lo, double hi) -> double
+{
+    return std::min(std::max(lo, val), hi);
+}
+
 }
