@@ -26,7 +26,7 @@ struct font_atlas
     i32                                 height; // height of an "a", used for centring
 
     auto get_character(char c) const -> const character&;
-    auto length_of(std::string_view message) -> i32;
+    auto length_of(std::string_view message) const -> i32;
 };
 
 }

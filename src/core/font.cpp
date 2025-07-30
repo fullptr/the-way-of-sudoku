@@ -12,7 +12,7 @@ auto font_atlas::get_character(char c) const -> const character&
     return missing_char;
 }
 
-auto font_atlas::length_of(std::string_view message) -> i32
+auto font_atlas::length_of(std::string_view message) const -> i32
 {
     if (message.empty()) {
         return 0;

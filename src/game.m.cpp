@@ -160,7 +160,12 @@ auto draw_sudoku_board(
                 for (auto mark : cell.centre_pencil_marks) {
                     s.append(std::to_string(mark));
                 }
-                r.push_text_box(s, cell_top_left, cell_size, cell_size, 2, colour);
+                auto scale = 2;
+                auto length = scale * r.font().length_of(s);
+                if (length > cell_size) {
+                    scale  = 1;
+                }
+                r.push_text_box(s, cell_top_left, cell_size, cell_size, scale, colour);
             }
         }
     }
@@ -210,8 +215,8 @@ auto scene_main_menu(sudoku::window& window) -> next_state
 {
     using namespace sudoku;
     auto timer = sudoku::timer{};
-    auto shapes = sudoku::renderer{};
-    auto ui    = sudoku::ui_engine{&shapes};
+    auto renderer = sudoku::renderer{};
+    auto ui    = sudoku::ui_engine{&renderer};
 
     while (window.is_running()) {
         const double dt = timer.on_update();
@@ -239,22 +244,22 @@ auto scene_main_menu(sudoku::window& window) -> next_state
         const auto para_left = 100;
         const auto para_top = 300;
         constexpr auto colour = from_hex(0xecf0f1);
-        shapes.push_text("Lorem ipsum dolor sit amet, consectetur adipiscing elit,", {para_left, para_top}, scale, colour);
-        shapes.push_text("sed do eiusmod tempor incididunt ut labore et dolore magna", {para_left, para_top + 1 * 11 * scale}, scale, colour);
-        shapes.push_text("aliqua. Ut enim ad minim veniam, quis nostrud exercitation", {para_left, para_top + 2 * 11 * scale}, scale, colour);
-        shapes.push_text("ullamco laboris nisi ut aliquip ex ea commodo consequat.", {para_left, para_top + 3 * 11 * scale}, scale, colour);
-        shapes.push_text("Duis aute irure dolor in reprehenderit in voluptate velit", {para_left, para_top + 4 * 11 * scale}, scale, colour);
-        shapes.push_text("esse cillum dolore eu fugiat nulla pariatur. Excepteur", {para_left, para_top + 5 * 11 * scale}, scale, colour);
-        shapes.push_text("sint occaecat cupidatat non proident, sunt in culpa", {para_left, para_top + 6 * 11 * scale}, scale, colour);
-        shapes.push_text("qui officia deserunt mollit anim id est laborum.", {para_left, para_top + 7 * 11 * scale}, scale, colour);
-        shapes.push_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz", {para_left, para_top + 8 * 11 * scale}, scale, colour);
-        shapes.push_text("0123456789 () {} [] ^ < > - _ = + ! ? : ; . , @ % $ / \\ \" ' # ~ & | `", {para_left, para_top + 9 * 11 * scale}, scale, colour);
+        renderer.push_text("Lorem ipsum dolor sit amet, consectetur adipiscing elit,", {para_left, para_top}, scale, colour);
+        renderer.push_text("sed do eiusmod tempor incididunt ut labore et dolore magna", {para_left, para_top + 1 * 11 * scale}, scale, colour);
+        renderer.push_text("aliqua. Ut enim ad minim veniam, quis nostrud exercitation", {para_left, para_top + 2 * 11 * scale}, scale, colour);
+        renderer.push_text("ullamco laboris nisi ut aliquip ex ea commodo consequat.", {para_left, para_top + 3 * 11 * scale}, scale, colour);
+        renderer.push_text("Duis aute irure dolor in reprehenderit in voluptate velit", {para_left, para_top + 4 * 11 * scale}, scale, colour);
+        renderer.push_text("esse cillum dolore eu fugiat nulla pariatur. Excepteur", {para_left, para_top + 5 * 11 * scale}, scale, colour);
+        renderer.push_text("sint occaecat cupidatat non proident, sunt in culpa", {para_left, para_top + 6 * 11 * scale}, scale, colour);
+        renderer.push_text("qui officia deserunt mollit anim id est laborum.", {para_left, para_top + 7 * 11 * scale}, scale, colour);
+        renderer.push_text("ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz", {para_left, para_top + 8 * 11 * scale}, scale, colour);
+        renderer.push_text("0123456789 () {} [] ^ < > - _ = + ! ? : ; . , @ % $ / \\ \" ' # ~ & | `", {para_left, para_top + 9 * 11 * scale}, scale, colour);
 
         std::array<char, 8> buf = {};
-        shapes.push_text_box(sudoku::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3, colour);
+        renderer.push_text_box(sudoku::format_to(buf, "{}", timer.frame_rate()), {0, 0}, 120, 50, 3, colour);
         ui.end_frame(dt);
 
-        shapes.draw(window.width(), window.height());
+        renderer.draw(window.width(), window.height());
         window.end_frame();
     }
 
