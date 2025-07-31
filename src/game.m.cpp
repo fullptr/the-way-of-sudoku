@@ -30,7 +30,7 @@ constexpr auto clear_colour = sudoku::from_hex(0x222f3e);
 
 namespace sudoku {
 
-auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
+auto hovered_cell_pos(const sudoku_board& board, const window& w) -> std::optional<glm::ivec2>
 {
     const auto mouse_pos = w.mouse_pos();
     
@@ -46,9 +46,18 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
     if (0 <= mouse_pos_sudoku_space.x && mouse_pos_sudoku_space.x < board_size && 0 <= mouse_pos_sudoku_space.y && mouse_pos_sudoku_space.y < board_size) {
         const auto x = mouse_pos_sudoku_space.x / cell_size;
         const auto y = mouse_pos_sudoku_space.y / cell_size;
-        return &board.at(x, y);
+        return glm::ivec2{x, y};
     }
 
+    return {};
+}
+
+auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
+{
+    const auto pos = hovered_cell_pos(board, w);
+    if (pos.has_value()) {
+        return &board.at(pos->x, pos->y);
+    }
     return nullptr;
 }
 
@@ -137,14 +146,15 @@ auto draw_sudoku_board(
             const auto cell_top_left = top_left + cell_size * glm::vec2{x, y};
             const auto cell_centre = cell_top_left + glm::vec2{cell_size, cell_size} / 2.0f;
 
-            const auto highlighted = is_in_region(w.mouse_pos(), cell_top_left, cell_size, cell_size);
-            auto cell_colour = highlighted ? colour_cell_hightlighted : colour_cell;
+            auto cell_colour = colour_cell;
             if (sol.has_value() && sol->empty_cells.contains(glm::ivec2{x, y})) {
                 const auto t = std::chrono::duration<double>(now - sol->solve_time).count();
                 cell_colour = lerp(from_hex(0xc0392b), cell_colour, t);
             }
             if (cell_colour != colour_cell) {
                 r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
+            } else if (board.selected().contains(glm::ivec2{x, y})) {
+                r.push_quad(cell_centre, cell_size, cell_size, 0, colour_cell_hightlighted);
             }
 
             const auto& cell = board.at(x, y);
@@ -175,7 +185,6 @@ auto draw_sudoku_board(
                     pos.y += (i32)(cell_size * 0.1f) + r.font().height * scale;
                     r.push_text(s, pos, scale, colour);
                 }
-
             }
         }
     }
@@ -368,7 +377,21 @@ auto scene_game(sudoku::window& window) -> next_state
         for (const auto event : window.events()) {
             ui.on_event(event);
 
-            if (auto e = event.get_if<keyboard_pressed_event>()) {
+            if (auto e = event.get_if<mouse_pressed_event>()) {
+                const auto cell_pos = hovered_cell_pos(board, window);
+                if (cell_pos.has_value() && board.valid(cell_pos->x, cell_pos->y)) {
+                    if (e->button == mouse::left) {
+                        std::print("inserting position\n");
+                        if (e->mods & modifier::shift) {
+                            board.selected().insert(*cell_pos);
+                        } else {
+                            board.selected().clear();
+                            board.selected().insert(*cell_pos);
+                        }
+                    }
+                }
+            }
+            else if (auto e = event.get_if<keyboard_pressed_event>()) {
                 if (auto cell = hovered_cell(board, window); cell && !cell->fixed) {
                     std::optional<i32> value = {};
                     switch (e->key) {

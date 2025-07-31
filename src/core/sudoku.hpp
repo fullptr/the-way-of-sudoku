@@ -1,9 +1,12 @@
 #pragma once
 #include <optional>
 #include <vector>
+#include <unordered_set>
 #include <print>
 #include <set>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 #include <glm/glm.hpp>
 
 namespace sudoku {
@@ -25,8 +28,9 @@ struct sudoku_region
 
 class sudoku_board
 {
-    u64                        d_size;
-    std::vector<sudoku_cell>   d_cells;
+    u64                            d_size;
+    std::vector<sudoku_cell>       d_cells;
+    std::unordered_set<glm::ivec2> d_selected;
 
 public:
     sudoku_board(u64 size)
@@ -34,21 +38,32 @@ public:
     {
     }
 
-    auto at(u64 x, u64 y) -> sudoku_cell& {
-        assert(x < d_size);
-        assert(y < d_size);
+    auto at(i32 x, i32 y) -> sudoku_cell& {
+        assert(valid(x, y));
         return d_cells[x + y * d_size];
     }
 
-    auto at(u64 x, u64 y) const -> const sudoku_cell& {
-        assert(x < d_size);
-        assert(y < d_size);
+    auto at(i32 x, i32 y) const -> const sudoku_cell& {
+        assert(valid(x, y));
         return d_cells[x + y * d_size];
     }
 
     auto size() const -> u64 {
         return d_size;
     }
+
+    auto valid(i32 x, i32 y) -> bool {
+        return 0 <= x && x < d_size && 0 <= y && y < d_size;
+    }
+
+    auto selected() -> std::unordered_set<glm::ivec2>& {
+        return d_selected;
+    }
+
+    auto selected() const -> const std::unordered_set<glm::ivec2>& {
+        return d_selected;
+    }
+
 };
 
 inline auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
