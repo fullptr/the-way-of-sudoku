@@ -497,7 +497,7 @@ auto scene_game(sudoku::window& window) -> next_state
                 if (cell != nullptr) {
                     if (e->button == mouse::left) {
                         if (e->mods & modifier::shift) {
-                            cell->selected = true;
+                            cell->selected = !cell->selected;
                         } else {
                             board.clear_selected();
                             cell->selected = true;
