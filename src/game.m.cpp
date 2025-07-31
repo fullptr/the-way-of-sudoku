@@ -61,15 +61,16 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
     return nullptr;
 }
 
-struct bad_solution
+struct solution
 {
+    bool solved = false;
     time_point solve_time;
     std::unordered_set<glm::ivec2> empty_cells;
 };
 
-auto check_solution(const sudoku_board& board, time_point time) -> std::optional<bad_solution>
+auto check_solution(const sudoku_board& board, time_point time) -> std::optional<solution>
 {
-    auto sol = bad_solution{};
+    auto sol = solution{};
     sol.solve_time = time;
 
     // check for empty cells
@@ -90,7 +91,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> std::optional
             const auto val = board.at(row, col).value;
             seen.insert(*val);
         }
-        if (seen.size() != board.size()) return bad_solution{}; // duplicate values in the row
+        if (seen.size() != board.size()) return solution{}; // duplicate values in the row
     }
 
     // check columns
@@ -100,7 +101,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> std::optional
             const auto val = board.at(row, col).value;
             seen.insert(*val);
         }
-        if (seen.size() != board.size()) return bad_solution{}; // duplicate values in the row
+        if (seen.size() != board.size()) return solution{}; // duplicate values in the row
     }
 
     // check regions
@@ -113,7 +114,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> std::optional
         }
     }
     for (const auto& [region, seen] : regions) {
-        if (seen.size() != board.size()) return bad_solution{};
+        if (seen.size() != board.size()) return solution{};
     }
 
     return std::nullopt;
@@ -123,7 +124,7 @@ auto draw_sudoku_board(
     renderer& r,
     const window& w,
     const sudoku_board& board,
-    const std::optional<bad_solution>& sol,
+    const std::optional<solution>& sol,
     const time_point& now
 )
     -> void
@@ -159,8 +160,12 @@ auto draw_sudoku_board(
 
             const auto& cell = board.at(x, y);
             if (cell.value.has_value()) {
-                const auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
-                r.push_text_box(std::format("{}", *cell.value), cell_top_left, cell_size, cell_size, 6, colour);
+                auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
+                auto scale = 6;
+                if (sol && sol->solved) {
+                    colour = from_hex(0x2ecc71);
+                }
+                r.push_text_box(std::format("{}", *cell.value), cell_top_left, cell_size, cell_size, scale, colour);
             } else {
                 if (!cell.centre_pencil_marks.empty()) {
                     const auto colour = colour_added_digits;
@@ -416,9 +421,9 @@ auto scene_game(sudoku::window& window) -> next_state
     auto renderer = sudoku::renderer{};
     auto ui       = sudoku::ui_engine{&renderer};
 
-    auto solution = std::optional<bad_solution>{};
+    auto sol = std::optional<solution>{};
 
-#define LEVEL 0
+#define LEVEL 2
 #if LEVEL == 0
     auto board = make_board(
         {
@@ -485,8 +490,8 @@ auto scene_game(sudoku::window& window) -> next_state
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
 
-        if (solution.has_value() && timer.now() - solution->solve_time > 1s) {
-            solution = {};
+        if (sol.has_value() && timer.now() - sol->solve_time > 1s) {
+            sol = {};
         }
 
         for (const auto event : window.events()) {
@@ -547,7 +552,7 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        draw_sudoku_board(renderer, window, board, solution, timer.now());
+        draw_sudoku_board(renderer, window, board, sol, timer.now());
         
         if (ui.button("Back", {0, 0}, 200, 50, 3)) {
             return next_state::main_menu;
@@ -555,8 +560,11 @@ auto scene_game(sudoku::window& window) -> next_state
 
         if (ui.button("Check Solution", {0, 55}, 200, 50, 3)) {
             const auto success = check_solution(board, timer.now());
-            solution = success;
+            sol = success;
             if (!success.has_value()) {
+                sol = solution{};
+                sol->solved = true;
+                sol->solve_time = timer.now();
                 std::print("solved!\n");
             }
         }
