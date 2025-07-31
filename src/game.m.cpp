@@ -519,6 +519,9 @@ auto scene_game(sudoku::window& window) -> next_state
                             clear_corner_pencil_mark(board);
                         }
                     } break;
+                    case keyboard::escape: {
+                        board.clear_selected();
+                    } break;
                     case keyboard::num_1: value = 1; break;
                     case keyboard::num_2: value = 2; break;
                     case keyboard::num_3: value = 3; break;
