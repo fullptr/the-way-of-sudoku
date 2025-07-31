@@ -381,7 +381,6 @@ auto scene_game(sudoku::window& window) -> next_state
                 const auto cell_pos = hovered_cell_pos(board, window);
                 if (cell_pos.has_value() && board.valid(cell_pos->x, cell_pos->y)) {
                     if (e->button == mouse::left) {
-                        std::print("inserting position\n");
                         if (e->mods & modifier::shift) {
                             board.selected().insert(*cell_pos);
                         } else {
@@ -389,19 +388,25 @@ auto scene_game(sudoku::window& window) -> next_state
                             board.selected().insert(*cell_pos);
                         }
                     }
+                } else {
+                    board.selected().clear();
                 }
             }
             else if (auto e = event.get_if<keyboard_pressed_event>()) {
-                if (auto cell = hovered_cell(board, window); cell && !cell->fixed) {
+                for (const auto pos : board.selected()) {
+                    if (!board.valid(pos.x, pos.y) || board.at(pos.x, pos.y).fixed) {
+                        continue;
+                    }
+                    auto& cell = board.at(pos.x, pos.y);
                     std::optional<i32> value = {};
                     switch (e->key) {
                         case keyboard::backspace: {
-                            if (cell->value.has_value()) {
-                                cell->value = {};
-                            } else if (!cell->centre_pencil_marks.empty()) {
-                                cell->centre_pencil_marks.clear();
-                            } else if (!cell->corner_pencil_marks.empty()) {
-                                cell->corner_pencil_marks.clear();
+                            if (cell.value.has_value()) {
+                                cell.value = {};
+                            } else if (!cell.centre_pencil_marks.empty()) {
+                                cell.centre_pencil_marks.clear();
+                            } else if (!cell.corner_pencil_marks.empty()) {
+                                cell.corner_pencil_marks.clear();
                             }
                         } break;
                         case keyboard::num_1: value = 1; break;
@@ -418,13 +423,13 @@ auto scene_game(sudoku::window& window) -> next_state
                     if (*value > board.size()) continue; // not a digit in the grid
 
                     if (e->mods & modifier::ctrl) {
-                        flip(cell->centre_pencil_marks, *value);
+                        flip(cell.centre_pencil_marks, *value);
                     }
                     else if (e->mods & modifier::shift) {
-                        flip(cell->corner_pencil_marks, *value);
+                        flip(cell.corner_pencil_marks, *value);
                     }
                     else {
-                        cell->value = *value;
+                        cell.value = *value;
                     }
                 }
             }
