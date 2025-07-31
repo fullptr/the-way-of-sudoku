@@ -61,6 +61,7 @@ public:
     }
 
     auto cells() -> std::vector<sudoku_cell>& { return d_cells; }
+    auto cells() const -> const std::vector<sudoku_cell>& { return d_cells; }
 };
 
 inline auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
