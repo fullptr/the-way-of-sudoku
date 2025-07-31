@@ -126,23 +126,16 @@ auto draw_sudoku_board(
     constexpr auto colour_cell_hightlighted = from_hex(0x34495e);
 
     const auto board_size = 0.9f * std::min(w.width(), w.height());
+    const auto board_centre = glm::vec2{w.width(), w.height()} / 2.0f;
     const auto cell_size = board_size / board.size();
-
-    auto top_left = glm::ivec2{w.width() / 2, w.height() / 2};
-    top_left.x -= board_size / 2;
-    top_left.y -= board_size / 2;
+    const auto top_left = board_centre - glm::vec2{board_size, board_size} / 2.0f;
 
     r.push_rect(top_left, board_size, board_size, colour_cell);
 
     for (int y = 0; y != board.size(); ++y) {
         for (int x = 0; x != board.size(); ++x) {
-            auto cell_top_left = top_left;
-            cell_top_left.x += x * cell_size;
-            cell_top_left.y += y * cell_size;
-
-            auto cell_centre = cell_top_left;
-            cell_centre.x += cell_size / 2;
-            cell_centre.y += cell_size / 2;
+            const auto cell_top_left = top_left + cell_size * glm::vec2{x, y};
+            const auto cell_centre = cell_top_left + glm::vec2{cell_size, cell_size} / 2.0f;
 
             const auto highlighted = is_in_region(w.mouse_pos(), cell_top_left, cell_size, cell_size);
             auto cell_colour = highlighted ? colour_cell_hightlighted : colour_cell;
@@ -165,11 +158,8 @@ auto draw_sudoku_board(
                     for (auto mark : cell.centre_pencil_marks) {
                         s.append(std::to_string(mark));
                     }
-                    auto scale = 2;
-                    auto length = scale * r.font().length_of(s);
-                    if (length > cell_size) {
-                        scale  = 1;
-                    }
+                    const auto length = 2 * r.font().length_of(s);
+                    const auto scale = length > cell_size ? 1 : 2;
                     r.push_text_box(s, cell_top_left, cell_size, cell_size, scale, colour);
                 }
                 if (!cell.corner_pencil_marks.empty()) {
@@ -178,11 +168,8 @@ auto draw_sudoku_board(
                     for (auto mark : cell.corner_pencil_marks) {
                         s.append(std::to_string(mark));
                     }
-                    auto scale = 2;
-                    auto length = scale * r.font().length_of(s);
-                    if (length > cell_size) {
-                        scale  = 1;
-                    }
+                    const auto length = 2 * r.font().length_of(s);
+                    const auto scale = length > cell_size ? 1 : 2;
                     auto pos = cell_top_left;
                     pos.x += (i32)(cell_size * 0.1f);
                     pos.y += (i32)(cell_size * 0.1f) + r.font().height * scale;
@@ -228,6 +215,15 @@ auto draw_sudoku_board(
                 r.push_line(a, b, from_hex(0xecf0f1), 1.f);
             }
         }
+    }
+}
+
+void flip(std::set<i32>& ints, i32 value)
+{
+    if (ints.contains(value)) {
+        ints.erase(value);
+    } else {
+        ints.insert(value);
     }
 }
 
@@ -292,10 +288,9 @@ auto scene_main_menu(sudoku::window& window) -> next_state
 auto scene_game(sudoku::window& window) -> next_state
 {
     using namespace sudoku;
-    auto timer = sudoku::timer{};
-    auto shapes = sudoku::renderer{};
-    auto ui    = sudoku::ui_engine{&shapes};
-    auto input = sudoku::input{};
+    auto timer    = sudoku::timer{};
+    auto renderer = sudoku::renderer{};
+    auto ui       = sudoku::ui_engine{&renderer};
 
     auto solution = std::optional<bad_solution>{};
 
@@ -365,7 +360,6 @@ auto scene_game(sudoku::window& window) -> next_state
     while (window.is_running()) {
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
-        input.on_new_frame();
 
         if (solution.has_value() && timer.now() - solution->solve_time > 1s) {
             solution = {};
@@ -373,12 +367,20 @@ auto scene_game(sudoku::window& window) -> next_state
 
         for (const auto event : window.events()) {
             ui.on_event(event);
-            input.on_event(event);
 
             if (auto e = event.get_if<keyboard_pressed_event>()) {
                 if (auto cell = hovered_cell(board, window); cell && !cell->fixed) {
                     std::optional<i32> value = {};
                     switch (e->key) {
+                        case keyboard::backspace: {
+                            if (cell->value.has_value()) {
+                                cell->value = {};
+                            } else if (!cell->centre_pencil_marks.empty()) {
+                                cell->centre_pencil_marks.clear();
+                            } else if (!cell->corner_pencil_marks.empty()) {
+                                cell->corner_pencil_marks.clear();
+                            }
+                        } break;
                         case keyboard::num_1: value = 1; break;
                         case keyboard::num_2: value = 2; break;
                         case keyboard::num_3: value = 3; break;
@@ -388,49 +390,25 @@ auto scene_game(sudoku::window& window) -> next_state
                         case keyboard::num_7: value = 7; break;
                         case keyboard::num_8: value = 8; break;
                         case keyboard::num_9: value = 9; break;
-                        case keyboard::backspace: value = -1; break;
                     }
-                    if (value) {
-                        if (e->mods & modifier::ctrl) {
-                            if (*value == -1) {
-                                cell->centre_pencil_marks.clear();
-                            } else if (*value <= board.size()) {
-                                if (cell->centre_pencil_marks.contains(*value)) {
-                                    cell->centre_pencil_marks.erase(*value);
-                                } else {
-                                    cell->centre_pencil_marks.insert(*value);
-                                }
-                            }
-                        }
-                        else if (e->mods & modifier::shift) {
-                            if (*value == -1) {
-                                cell->corner_pencil_marks.clear();
-                            } else if (*value <= board.size()) {
-                                if (cell->corner_pencil_marks.contains(*value)) {
-                                    cell->corner_pencil_marks.erase(*value);
-                                } else {
-                                    cell->corner_pencil_marks.insert(*value);
-                                }
-                            }
-                        }
-                        else {
-                            if (*value == -1) {
-                                if (cell->value.has_value()) {
-                                    cell->value = {};
-                                } else if (!cell->centre_pencil_marks.empty()) {
-                                    cell->centre_pencil_marks.clear();
-                                } else if (!cell->corner_pencil_marks.empty()) {
-                                    cell->corner_pencil_marks.clear();
-                                }
-                            } else if (*value <= board.size()) {
-                                cell->value = *value;
-                            }
-                        }
+                    if (!value) continue; // keyboard input was not a digit
+                    if (*value > board.size()) continue; // not a digit in the grid
+
+                    if (e->mods & modifier::ctrl) {
+                        flip(cell->centre_pencil_marks, *value);
+                    }
+                    else if (e->mods & modifier::shift) {
+                        flip(cell->corner_pencil_marks, *value);
+                    }
+                    else {
+                        cell->value = *value;
                     }
                 }
             }
         }
 
+        draw_sudoku_board(renderer, window, board, solution, timer.now());
+        
         if (ui.button("Back", {0, 0}, 200, 50, 3)) {
             return next_state::main_menu;
         }
@@ -443,11 +421,8 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        draw_sudoku_board(shapes, window, board, solution, timer.now());
-
         ui.end_frame(dt);
-
-        shapes.draw(window.width(), window.height());
+        renderer.draw(window.width(), window.height());
         window.end_frame();
     }
 
