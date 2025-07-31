@@ -2,6 +2,7 @@
 #include <optional>
 #include <vector>
 #include <print>
+#include <set>
 
 #include <glm/glm.hpp>
 
@@ -12,6 +13,9 @@ struct sudoku_cell
     std::optional<i32> value = {};
     bool               fixed = false;
     std::optional<i32> region = {};
+
+    std::set<i32> corner_pencil_marks;
+    std::set<i32> centre_pencil_marks;
 };
 
 struct sudoku_region

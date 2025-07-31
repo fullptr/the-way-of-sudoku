@@ -74,6 +74,8 @@ public:
     // Renders all queued up geometry
     void draw(i32 screen_width, i32 screen_height);
 
+    auto font() const -> const font_atlas& { return d_atlas; }
+
     // Queues up geometry to render
     void push_rect(glm::vec2 top_left, float width, float height, glm::vec4 colour);
     void push_quad(glm::vec2 centre, float width, float height, float angle, glm::vec4 colour);
