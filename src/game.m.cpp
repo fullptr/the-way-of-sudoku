@@ -153,7 +153,7 @@ auto draw_sudoku_board(
             }
             if (cell_colour != colour_cell) {
                 r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
-            } else if (board.selected().contains(glm::ivec2{x, y})) {
+            } else if (board.at(x, y).selected) {
                 r.push_quad(cell_centre, cell_size, cell_size, 0, colour_cell_hightlighted);
             }
 
@@ -378,26 +378,25 @@ auto scene_game(sudoku::window& window) -> next_state
             ui.on_event(event);
 
             if (auto e = event.get_if<mouse_pressed_event>()) {
-                const auto cell_pos = hovered_cell_pos(board, window);
-                if (cell_pos.has_value() && board.valid(cell_pos->x, cell_pos->y)) {
+                auto cell = hovered_cell(board, window);
+                if (cell != nullptr) {
                     if (e->button == mouse::left) {
                         if (e->mods & modifier::shift) {
-                            board.selected().insert(*cell_pos);
+                            cell->selected = true;
                         } else {
-                            board.selected().clear();
-                            board.selected().insert(*cell_pos);
+                            board.clear_selected();
+                            cell->selected = true;
                         }
                     }
                 } else {
-                    board.selected().clear();
+                    board.clear_selected();
                 }
             }
             else if (auto e = event.get_if<keyboard_pressed_event>()) {
-                for (const auto pos : board.selected()) {
-                    if (!board.valid(pos.x, pos.y) || board.at(pos.x, pos.y).fixed) {
+                for (auto& cell : board.cells()) {
+                    if (cell.fixed || !cell.selected) {
                         continue;
                     }
-                    auto& cell = board.at(pos.x, pos.y);
                     std::optional<i32> value = {};
                     switch (e->key) {
                         case keyboard::backspace: {

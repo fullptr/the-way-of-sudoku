@@ -16,6 +16,7 @@ struct sudoku_cell
     std::optional<i32> value = {};
     bool               fixed = false;
     std::optional<i32> region = {};
+    bool               selected = false;
 
     std::set<i32> corner_pencil_marks;
     std::set<i32> centre_pencil_marks;
@@ -30,7 +31,6 @@ class sudoku_board
 {
     u64                            d_size;
     std::vector<sudoku_cell>       d_cells;
-    std::unordered_set<glm::ivec2> d_selected;
 
 public:
     sudoku_board(u64 size)
@@ -56,14 +56,11 @@ public:
         return 0 <= x && x < d_size && 0 <= y && y < d_size;
     }
 
-    auto selected() -> std::unordered_set<glm::ivec2>& {
-        return d_selected;
+    auto clear_selected() -> void {
+        for (auto& cell : d_cells) cell.selected = false;
     }
 
-    auto selected() const -> const std::unordered_set<glm::ivec2>& {
-        return d_selected;
-    }
-
+    auto cells() -> std::vector<sudoku_cell>& { return d_cells; }
 };
 
 inline auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
