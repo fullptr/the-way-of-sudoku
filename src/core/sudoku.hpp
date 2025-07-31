@@ -1,9 +1,12 @@
 #pragma once
 #include <optional>
 #include <vector>
+#include <unordered_set>
 #include <print>
 #include <set>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 #include <glm/glm.hpp>
 
 namespace sudoku {
@@ -13,6 +16,7 @@ struct sudoku_cell
     std::optional<i32> value = {};
     bool               fixed = false;
     std::optional<i32> region = {};
+    bool               selected = false;
 
     std::set<i32> corner_pencil_marks;
     std::set<i32> centre_pencil_marks;
@@ -25,8 +29,8 @@ struct sudoku_region
 
 class sudoku_board
 {
-    u64                        d_size;
-    std::vector<sudoku_cell>   d_cells;
+    u64                            d_size;
+    std::vector<sudoku_cell>       d_cells;
 
 public:
     sudoku_board(u64 size)
@@ -34,21 +38,30 @@ public:
     {
     }
 
-    auto at(u64 x, u64 y) -> sudoku_cell& {
-        assert(x < d_size);
-        assert(y < d_size);
+    auto at(i32 x, i32 y) -> sudoku_cell& {
+        assert(valid(x, y));
         return d_cells[x + y * d_size];
     }
 
-    auto at(u64 x, u64 y) const -> const sudoku_cell& {
-        assert(x < d_size);
-        assert(y < d_size);
+    auto at(i32 x, i32 y) const -> const sudoku_cell& {
+        assert(valid(x, y));
         return d_cells[x + y * d_size];
     }
 
     auto size() const -> u64 {
         return d_size;
     }
+
+    auto valid(i32 x, i32 y) -> bool {
+        return 0 <= x && x < d_size && 0 <= y && y < d_size;
+    }
+
+    auto clear_selected() -> void {
+        for (auto& cell : d_cells) cell.selected = false;
+    }
+
+    auto cells() -> std::vector<sudoku_cell>& { return d_cells; }
+    auto cells() const -> const std::vector<sudoku_cell>& { return d_cells; }
 };
 
 inline auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
