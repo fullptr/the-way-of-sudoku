@@ -504,12 +504,11 @@ auto scene_game(sudoku::window& window) -> next_state
                     if (e->button == mouse::left) {
                         if (e->mods & modifier::shift) {
                             cell->selected = !cell->selected;
-                            mouse_down = cell->selected;
                         } else {
                             board.clear_selected();
                             cell->selected = true;
-                            mouse_down = true;
                         }
+                        mouse_down = cell->selected;
                     }
                 } else {
                     board.clear_selected();
