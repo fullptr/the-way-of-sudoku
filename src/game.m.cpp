@@ -486,6 +486,7 @@ auto scene_game(sudoku::window& window) -> next_state
     );
 #endif
 
+    bool mouse_down = false;
     while (window.is_running()) {
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
@@ -501,6 +502,7 @@ auto scene_game(sudoku::window& window) -> next_state
                 auto cell = hovered_cell(board, window);
                 if (cell != nullptr) {
                     if (e->button == mouse::left) {
+                        mouse_down = true;
                         if (e->mods & modifier::shift) {
                             cell->selected = !cell->selected;
                         } else {
@@ -510,6 +512,19 @@ auto scene_game(sudoku::window& window) -> next_state
                     }
                 } else {
                     board.clear_selected();
+                }
+            }
+            else if (auto e = event.get_if<mouse_released_event>()) {
+                if (e->button == mouse::left) {
+                    mouse_down = false;
+                }
+            }
+            else if (auto e = event.get_if<mouse_moved_event>()) {
+                if (mouse_down) {
+                    auto cell = hovered_cell(board, window);
+                    if (cell != nullptr) {
+                        cell->selected = true;
+                    }
                 }
             }
             else if (auto e = event.get_if<keyboard_pressed_event>()) {
