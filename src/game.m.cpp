@@ -522,6 +522,9 @@ auto scene_game(sudoku::window& window) -> next_state
 
         for (const auto event : window.events()) {
             ui.on_event(event);
+            if (std::holds_alternative<solved_rs>(state)) {
+                continue; // Don't allow updating the board when it's solved
+            }
 
             if (auto e = event.get_if<mouse_pressed_event>()) {
                 auto cell = hovered_cell(board, window);
