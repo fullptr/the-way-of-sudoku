@@ -61,27 +61,48 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
     return nullptr;
 }
 
-struct solution
+// Regular state, still being solved
+struct normal_rs
+{};
+
+// Error state for when the board isn't filled
+struct empty_cells_invalid_rs
 {
-    bool solved = false;
-    time_point solve_time;
-    std::unordered_set<glm::ivec2> empty_cells;
+    time_point time;
+    std::unordered_set<glm::ivec2> cells;
 };
 
-auto check_solution(const sudoku_board& board, time_point time) -> std::optional<solution>
+// Error state for when the board is filled but the constraints dont hold
+struct constraint_faiure_rs
+{};
+
+// Success state for a solved grid
+struct solved_rs
 {
-    auto sol = solution{};
-    sol.solve_time = time;
+    time_point time;
+};
+
+using board_render_state = std::variant<
+    normal_rs,
+    empty_cells_invalid_rs,
+    constraint_faiure_rs,
+    solved_rs
+>;
+
+auto check_solution(const sudoku_board& board, time_point time) -> board_render_state
+{
+    auto empty_cells = empty_cells_invalid_rs{};
+    empty_cells.time = time;
 
     // check for empty cells
     for (i32 row = 0; row != board.size(); ++row) {
         for (i32 col = 0; col != board.size(); ++col) {
             const auto val = board.at(row, col).value;
-            if (!val.has_value()) sol.empty_cells.insert(glm::ivec2{row, col});
+            if (!val.has_value()) empty_cells.cells.insert(glm::ivec2{row, col});
         }
     }
-    if (!sol.empty_cells.empty()) { // bad solution because the board isn't filled
-        return sol;
+    if (!empty_cells.cells.empty()) { // bad solution because the board isn't filled
+        return empty_cells;
     }
 
     // check rows
@@ -91,7 +112,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> std::optional
             const auto val = board.at(row, col).value;
             seen.insert(*val);
         }
-        if (seen.size() != board.size()) return solution{}; // duplicate values in the row
+        if (seen.size() != board.size()) return constraint_faiure_rs{}; // duplicate values in the row
     }
 
     // check columns
@@ -101,7 +122,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> std::optional
             const auto val = board.at(row, col).value;
             seen.insert(*val);
         }
-        if (seen.size() != board.size()) return solution{}; // duplicate values in the row
+        if (seen.size() != board.size()) return constraint_faiure_rs{}; // duplicate values in the row
     }
 
     // check regions
@@ -114,17 +135,17 @@ auto check_solution(const sudoku_board& board, time_point time) -> std::optional
         }
     }
     for (const auto& [region, seen] : regions) {
-        if (seen.size() != board.size()) return solution{};
+        if (seen.size() != board.size()) return constraint_faiure_rs{};
     }
 
-    return std::nullopt;
+    return solved_rs{ .time = time };
 }
 
 auto draw_sudoku_board(
     renderer& r,
     const window& w,
     const sudoku_board& board,
-    const std::optional<solution>& sol,
+    const board_render_state& state,
     const time_point& now
 )
     -> void
@@ -148,9 +169,11 @@ auto draw_sudoku_board(
             const auto cell_centre = cell_top_left + glm::vec2{cell_size, cell_size} / 2.0f;
 
             auto cell_colour = colour_cell;
-            if (sol.has_value() && sol->empty_cells.contains(glm::ivec2{x, y})) {
-                const auto t = std::chrono::duration<double>(now - sol->solve_time).count();
-                cell_colour = lerp(from_hex(0xc0392b), cell_colour, t);
+            if (auto inner = std::get_if<empty_cells_invalid_rs>(&state)) {
+                if (inner->cells.contains(glm::ivec2{x, y})) {
+                    const auto t = std::chrono::duration<double>(now - inner->time).count();
+                    cell_colour = lerp(from_hex(0xc0392b), cell_colour, t);
+                }
             }
             if (cell_colour != colour_cell) {
                 r.push_quad(cell_centre, cell_size, cell_size, 0, cell_colour);
@@ -162,7 +185,7 @@ auto draw_sudoku_board(
             if (cell.value.has_value()) {
                 auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
                 auto scale = 6;
-                if (sol && sol->solved) {
+                if (std::holds_alternative<solved_rs>(state)) {
                     colour = from_hex(0x2ecc71);
                 }
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, cell_size, cell_size, scale, colour);
@@ -421,7 +444,7 @@ auto scene_game(sudoku::window& window) -> next_state
     auto renderer = sudoku::renderer{};
     auto ui       = sudoku::ui_engine{&renderer};
 
-    auto sol = std::optional<solution>{};
+    auto state = board_render_state{ normal_rs{} };
 
 #define LEVEL 2
 #if LEVEL == 0
@@ -491,8 +514,10 @@ auto scene_game(sudoku::window& window) -> next_state
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
 
-        if (sol.has_value() && timer.now() - sol->solve_time > 1s) {
-            sol = {};
+        if (auto inner = std::get_if<empty_cells_invalid_rs>(&state)) {
+            if (timer.now() - inner->time > 1s) {
+                state = normal_rs{};
+            }
         }
 
         for (const auto event : window.events()) {
@@ -567,19 +592,15 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        draw_sudoku_board(renderer, window, board, sol, timer.now());
+        draw_sudoku_board(renderer, window, board, state, timer.now());
         
         if (ui.button("Back", {0, 0}, 200, 50, 3)) {
             return next_state::main_menu;
         }
 
         if (ui.button("Check Solution", {0, 55}, 200, 50, 3)) {
-            const auto success = check_solution(board, timer.now());
-            sol = success;
-            if (!success.has_value()) {
-                sol = solution{};
-                sol->solved = true;
-                sol->solve_time = timer.now();
+            state = check_solution(board, timer.now());
+            if (std::holds_alternative<solved_rs>(state)) {
                 std::print("solved!\n");
             }
         }
