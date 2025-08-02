@@ -66,7 +66,7 @@ struct normal_rs
 {};
 
 // Error state for when the board isn't filled
-struct empty_cells_invalid_rs
+struct empty_cells_rs
 {
     time_point time;
     std::unordered_set<glm::ivec2> cells;
@@ -74,7 +74,9 @@ struct empty_cells_invalid_rs
 
 // Error state for when the board is filled but the constraints dont hold
 struct constraint_faiure_rs
-{};
+{
+    // TODO
+};
 
 // Success state for a solved grid
 struct solved_rs
@@ -84,14 +86,14 @@ struct solved_rs
 
 using board_render_state = std::variant<
     normal_rs,
-    empty_cells_invalid_rs,
+    empty_cells_rs,
     constraint_faiure_rs,
     solved_rs
 >;
 
 auto check_solution(const sudoku_board& board, time_point time) -> board_render_state
 {
-    auto empty_cells = empty_cells_invalid_rs{};
+    auto empty_cells = empty_cells_rs{};
     empty_cells.time = time;
 
     // check for empty cells
@@ -169,7 +171,7 @@ auto draw_sudoku_board(
             const auto cell_centre = cell_top_left + glm::vec2{cell_size, cell_size} / 2.0f;
 
             auto cell_colour = colour_cell;
-            if (auto inner = std::get_if<empty_cells_invalid_rs>(&state)) {
+            if (auto inner = std::get_if<empty_cells_rs>(&state)) {
                 if (inner->cells.contains(glm::ivec2{x, y})) {
                     const auto t = std::chrono::duration<double>(now - inner->time).count();
                     cell_colour = lerp(from_hex(0xc0392b), cell_colour, t);
@@ -514,7 +516,7 @@ auto scene_game(sudoku::window& window) -> next_state
         const double dt = timer.on_update();
         window.begin_frame(clear_colour);
 
-        if (auto inner = std::get_if<empty_cells_invalid_rs>(&state)) {
+        if (auto inner = std::get_if<empty_cells_rs>(&state)) {
             if (timer.now() - inner->time > 1s) {
                 state = normal_rs{};
             }
