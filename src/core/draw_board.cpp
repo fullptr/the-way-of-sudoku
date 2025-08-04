@@ -64,7 +64,7 @@ auto draw_constraints(renderer& r, const sudoku_board& board, const board_render
                 
                 if (inner->cells.contains(glm::ivec2{x, y})) {
                     const auto t = std::chrono::duration<double>(now - inner->time).count();
-                    auto cell_colour = lerp(from_hex(0xc0392b), colour_cell, t);
+                    auto cell_colour = from_hex(0xc0392b, 1 - t);
                     const auto cell_centre = config.tl + config.cell_size * glm::vec2{x + 0.5f, y + 0.5f};
                     r.push_quad(cell_centre, config.cell_size, config.cell_size, 0, cell_colour);
                 }
@@ -118,8 +118,6 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
                 continue; // only render the main digit if it's given
             }
 
-            const auto colour = colour_added_digits;
-
             if (!cell.centre_pencil_marks.empty()) {
                 auto s = std::string{};
                 for (auto mark : cell.centre_pencil_marks) {
@@ -127,7 +125,7 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
                 }
                 const auto length = 2 * r.font().length_of(s);
                 const auto scale = length > config.cell_size ? 1 : 2;
-                r.push_text_box(s, cell_top_left, config.cell_size, config.cell_size, scale, colour);
+                r.push_text_box(s, cell_top_left, config.cell_size, config.cell_size, scale, colour_added_digits);
             }
 
             if (!cell.corner_pencil_marks.empty()) {
@@ -141,7 +139,7 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
                 auto pos = cell_top_left;
                 pos.x += (i32)(config.cell_size * 0.1f);
                 pos.y += (i32)(config.cell_size * 0.1f) + r.font().height * scale;
-                r.push_text(s, pos, scale, colour);
+                r.push_text(s, pos, scale, colour_added_digits);
             }
         }
     }
