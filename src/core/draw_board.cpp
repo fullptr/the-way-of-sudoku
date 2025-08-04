@@ -38,8 +38,35 @@ auto draw_backboard(renderer& r, glm::vec2 screen_dimensions, const sudoku_board
 }
 
 // draw highlighted
+auto draw_highlighted(renderer& r, glm::vec2 screen_dimensions, const sudoku_board& board, const render_config& config)
+{
+    for (int y = 0; y != board.size(); ++y) {
+        for (int x = 0; x != board.size(); ++x) {
+            if (board.at(x, y).selected) {
+                const auto cell_centre = config.tl + config.cell_size * glm::vec2{x + 0.5f, y + 0.5f};
+                r.push_quad(cell_centre, config.cell_size, config.cell_size, 0, colour_cell_hightlighted);
+            }
+        }
+    }
+}
 
 // draw constraints
+auto draw_constraints(renderer& r, glm::vec2 screen_dimensions, const sudoku_board& board, const board_render_state& state, const render_config& config, const time_point& now)
+{
+    if (auto inner = std::get_if<empty_cells_rs>(&state)) {
+        for (int y = 0; y != board.size(); ++y) {
+            for (int x = 0; x != board.size(); ++x) {
+                
+                if (inner->cells.contains(glm::ivec2{x, y})) {
+                    const auto t = std::chrono::duration<double>(now - inner->time).count();
+                    auto cell_colour = lerp(from_hex(0xc0392b), colour_cell, t);
+                    const auto cell_centre = config.tl + config.cell_size * glm::vec2{x + 0.5f, y + 0.5f};
+                    r.push_quad(cell_centre, config.cell_size, config.cell_size, 0, cell_colour);
+                }
+            }
+        }
+    }
+}
 
 // draw border
 
@@ -69,24 +96,13 @@ void draw_board(
     };
 
     draw_backboard(r, screen_dimensions, board, config);
+    draw_highlighted(r, screen_dimensions, board, config);
+    draw_constraints(r, screen_dimensions, board, state, config, now);
 
     for (int y = 0; y != board.size(); ++y) {
         for (int x = 0; x != board.size(); ++x) {
             const auto cell_top_left = top_left + config.cell_size * glm::vec2{x, y};
             const auto cell_centre = cell_top_left + glm::vec2{config.cell_size, config.cell_size} / 2.0f;
-
-            auto cell_colour = colour_cell;
-            if (auto inner = std::get_if<empty_cells_rs>(&state)) {
-                if (inner->cells.contains(glm::ivec2{x, y})) {
-                    const auto t = std::chrono::duration<double>(now - inner->time).count();
-                    cell_colour = lerp(from_hex(0xc0392b), cell_colour, t);
-                }
-            }
-            if (cell_colour != colour_cell) {
-                r.push_quad(cell_centre, config.cell_size, config.cell_size, 0, cell_colour);
-            } else if (board.at(x, y).selected) {
-                r.push_quad(cell_centre, config.cell_size, config.cell_size, 0, colour_cell_hightlighted);
-            }
 
             const auto& cell = board.at(x, y);
             if (cell.value.has_value()) {
