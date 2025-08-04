@@ -13,6 +13,8 @@ constexpr auto colour_cell_hightlighted = from_hex(0x34495e);
 
 struct render_config
 {
+    glm::vec2 screen_dimensions;
+
     f32       board_size;
     glm::vec2 board_centre;
 
@@ -25,7 +27,7 @@ struct render_config
 };
 
 // draw backboard
-auto draw_backboard(renderer& r, glm::vec2 screen_dimensions, const sudoku_board& board, const render_config& config)
+auto draw_backboard(renderer& r, const sudoku_board& board, const render_config& config)
 {
     r.push_rect(config.tl, config.board_size, config.board_size, colour_cell);
 
@@ -40,7 +42,7 @@ auto draw_backboard(renderer& r, glm::vec2 screen_dimensions, const sudoku_board
 }
 
 // draw highlighted
-auto draw_highlighted(renderer& r, glm::vec2 screen_dimensions, const sudoku_board& board, const render_config& config)
+auto draw_highlighted(renderer& r, const sudoku_board& board, const render_config& config)
 {
     for (int y = 0; y != board.size(); ++y) {
         for (int x = 0; x != board.size(); ++x) {
@@ -53,7 +55,7 @@ auto draw_highlighted(renderer& r, glm::vec2 screen_dimensions, const sudoku_boa
 }
 
 // draw constraints
-auto draw_constraints(renderer& r, glm::vec2 screen_dimensions, const sudoku_board& board, const board_render_state& state, const render_config& config, const time_point& now)
+auto draw_constraints(renderer& r, const sudoku_board& board, const board_render_state& state, const render_config& config, const time_point& now)
 {
     // should this be elsewhere? probably...
     if (auto inner = std::get_if<empty_cells_rs>(&state)) {
@@ -130,6 +132,7 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
 
             if (!cell.corner_pencil_marks.empty()) {
                 auto s = std::string{};
+                std::erase(s, 'c');
                 for (auto mark : cell.corner_pencil_marks) {
                     s.append(std::to_string(mark));
                 }
@@ -167,9 +170,9 @@ void draw_board(
         .br = top_left + glm::vec2{board_size, board_size}
     };
 
-    draw_backboard(r, screen_dimensions, board, config);
-    draw_highlighted(r, screen_dimensions, board, config);
-    draw_constraints(r, screen_dimensions, board, state, config, now);
+    draw_backboard(r, board, config);
+    draw_highlighted(r, board, config);
+    draw_constraints(r, board, state, config, now);
     draw_border(r, config);
     draw_digits(r, board, state, config);
 }
