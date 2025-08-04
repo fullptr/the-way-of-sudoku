@@ -39,13 +39,12 @@ using board_render_state = std::variant<
     solved_rs
 >;
 
-auto draw_board(
+void draw_board(
     renderer& r,
     glm::vec2 screen_dimensions,
     const sudoku_board& board,
     const board_render_state& state,
     const time_point& now
-)
-    -> void;
+);
 
 }
