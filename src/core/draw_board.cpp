@@ -53,6 +53,7 @@ auto draw_highlighted(renderer& r, glm::vec2 screen_dimensions, const sudoku_boa
 // draw constraints
 auto draw_constraints(renderer& r, glm::vec2 screen_dimensions, const sudoku_board& board, const board_render_state& state, const render_config& config, const time_point& now)
 {
+    // should this be elsewhere? probably...
     if (auto inner = std::get_if<empty_cells_rs>(&state)) {
         for (int y = 0; y != board.size(); ++y) {
             for (int x = 0; x != board.size(); ++x) {
@@ -66,42 +67,40 @@ auto draw_constraints(renderer& r, glm::vec2 screen_dimensions, const sudoku_boa
             }
         }
     }
+
+    // draw the boundaries of the regions
+    for (i32 x = 0; x != board.size(); ++x) {
+        for (i32 y = 0; y != board.size(); ++y) {
+            if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
+                const auto a = config.tl + config.cell_size * glm::vec2{x + 1, y};
+                const auto b = config.tl + config.cell_size * glm::vec2{x + 1, y + 1};
+                r.push_line(a, b, from_hex(0xecf0f1), 1.f);
+            }
+
+            if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
+                const auto a = config.tl + config.cell_size * glm::vec2{x,     y + 1};
+                const auto b = config.tl + config.cell_size * glm::vec2{x + 1, y + 1};
+                r.push_line(a, b, from_hex(0xecf0f1), 1.f);
+            }
+        }
+    }
 }
 
 // draw border
-
-// draw digits
-
+auto draw_border(renderer& r, const render_config& config)
+{
+    r.push_line(config.tl, config.tr, from_hex(0xecf0f1), 2.5f);
+    r.push_line(config.tr, config.br, from_hex(0xecf0f1), 2.5f);
+    r.push_line(config.br, config.bl, from_hex(0xecf0f1), 2.5f);
+    r.push_line(config.bl, config.tl, from_hex(0xecf0f1), 2.5f);
 }
 
-void draw_board(
-    renderer& r,
-    glm::vec2 screen_dimensions,
-    const sudoku_board& board,
-    const board_render_state& state,
-    const time_point& now)
+// draw digits
+auto draw_digits(renderer& r, const sudoku_board& board, const board_render_state& state, const render_config& config)
 {
-    const auto board_size = 0.9f * std::min(screen_dimensions.x, screen_dimensions.y);
-    const auto board_centre = screen_dimensions / 2.0f;
-    const auto top_left = board_centre - glm::vec2{board_size, board_size} / 2.0f;
-
-    const auto config = render_config{
-        .board_size = board_size,
-        .board_centre = board_centre,
-        .cell_size = board_size / board.size(),
-        .tl = top_left,
-        .tr = top_left + glm::vec2{board_size, 0},
-        .bl = top_left + glm::vec2{0, board_size},
-        .br = top_left + glm::vec2{board_size, board_size}
-    };
-
-    draw_backboard(r, screen_dimensions, board, config);
-    draw_highlighted(r, screen_dimensions, board, config);
-    draw_constraints(r, screen_dimensions, board, state, config, now);
-
     for (int y = 0; y != board.size(); ++y) {
         for (int x = 0; x != board.size(); ++x) {
-            const auto cell_top_left = top_left + config.cell_size * glm::vec2{x, y};
+            const auto cell_top_left = config.tl + config.cell_size * glm::vec2{x, y};
             const auto cell_centre = cell_top_left + glm::vec2{config.cell_size, config.cell_size} / 2.0f;
 
             const auto& cell = board.at(x, y);
@@ -139,29 +138,36 @@ void draw_board(
             }
         }
     }
+}
 
-    // draw boundary
-    r.push_line(config.tl, config.tr, from_hex(0xecf0f1), 2.5f);
-    r.push_line(config.tr, config.br, from_hex(0xecf0f1), 2.5f);
-    r.push_line(config.br, config.bl, from_hex(0xecf0f1), 2.5f);
-    r.push_line(config.bl, config.tl, from_hex(0xecf0f1), 2.5f);
+}
 
-    // draw regions
-    for (i32 x = 0; x != board.size(); ++x) {
-        for (i32 y = 0; y != board.size(); ++y) {
-            if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
-                const auto a = config.tl + config.cell_size * glm::vec2{x + 1, y};
-                const auto b = config.tl + config.cell_size * glm::vec2{x + 1, y + 1};
-                r.push_line(a, b, from_hex(0xecf0f1), 1.f);
-            }
+void draw_board(
+    renderer& r,
+    glm::vec2 screen_dimensions,
+    const sudoku_board& board,
+    const board_render_state& state,
+    const time_point& now)
+{
+    const auto board_size = 0.9f * std::min(screen_dimensions.x, screen_dimensions.y);
+    const auto board_centre = screen_dimensions / 2.0f;
+    const auto top_left = board_centre - glm::vec2{board_size, board_size} / 2.0f;
 
-            if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
-                const auto a = config.tl + config.cell_size * glm::vec2{x,     y + 1};
-                const auto b = config.tl + config.cell_size * glm::vec2{x + 1, y + 1};
-                r.push_line(a, b, from_hex(0xecf0f1), 1.f);
-            }
-        }
-    }
+    const auto config = render_config{
+        .board_size = board_size,
+        .board_centre = board_centre,
+        .cell_size = board_size / board.size(),
+        .tl = top_left,
+        .tr = top_left + glm::vec2{board_size, 0},
+        .bl = top_left + glm::vec2{0, board_size},
+        .br = top_left + glm::vec2{board_size, board_size}
+    };
+
+    draw_backboard(r, screen_dimensions, board, config);
+    draw_highlighted(r, screen_dimensions, board, config);
+    draw_constraints(r, screen_dimensions, board, state, config, now);
+    draw_border(r, config);
+    draw_digits(r, board, state, config);
 }
 
 }
