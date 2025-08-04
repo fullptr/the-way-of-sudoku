@@ -85,58 +85,5 @@ auto _print_inner(const std::string& msg) -> void
 {
     std::cout << msg;
 }
-
-auto get_executable_filepath() -> std::filesystem::path
-{
-    auto buffer = std::vector<char>{};
-    buffer.resize(16);
-    while (true) {
-        const auto rc = GetModuleFileNameA(nullptr, buffer.data(), buffer.size());
-        if (rc < buffer.size()) {
-            return std::filesystem::path{buffer.data()};
-        }
-        buffer.resize(2 * buffer.size());
-    }
-}
-
-auto mouse_pos_world_space(const input& in, const sudoku::camera& c) -> glm::vec2
-{
-    return in.position();
-}
-
-auto pixel_at_mouse(const input& in, const sudoku::camera& c) -> pixel_pos
-{
-    const auto p = glm::ivec2{mouse_pos_world_space(in, c)};
-    return {p.x, p.y};
-}
-
-auto pixel_to_physics(glm::vec2 px) -> b2Vec2
-{
-    b2Vec2 pos(static_cast<float>(px.x) / sudoku::config::pixels_per_meter, static_cast<float>(px.y) / sudoku::config::pixels_per_meter);
-    return pos;
-}
-
-auto pixel_to_physics(pixel_pos px) -> b2Vec2
-{
-    b2Vec2 pos(static_cast<float>(px.x) / sudoku::config::pixels_per_meter, static_cast<float>(px.y) / sudoku::config::pixels_per_meter);
-    return pos;
-}
-
-auto pixel_to_physics(float px) -> float
-{
-    return px / sudoku::config::pixels_per_meter;
-}
-
-// Converts a point in world space to pixel space
-auto physics_to_pixel(b2Vec2 px) -> glm::vec2
-{
-    glm::vec2 pos(px.x * sudoku::config::pixels_per_meter, px.y * sudoku::config::pixels_per_meter);
-    return pos;
-}
-
-auto physics_to_pixel(float px) -> float
-{
-    return px * sudoku::config::pixels_per_meter;
-}
     
 }

@@ -63,7 +63,8 @@ auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
 
 // Regular state, still being solved
 struct normal_rs
-{};
+{
+};
 
 // Error state for when the board isn't filled
 struct empty_cells_rs
