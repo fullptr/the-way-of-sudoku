@@ -4,7 +4,7 @@ namespace sudoku {
 
 auto draw_board(
     renderer& r,
-    const window& w,
+    glm::vec2 screen_dimensions,
     const sudoku_board& board,
     const board_render_state& state,
     const time_point& now
@@ -17,8 +17,8 @@ auto draw_board(
     constexpr auto colour_cell = from_hex(0x2c3e50);
     constexpr auto colour_cell_hightlighted = from_hex(0x34495e);
 
-    const auto board_size = 0.9f * std::min(w.width(), w.height());
-    const auto board_centre = glm::vec2{w.width(), w.height()} / 2.0f;
+    const auto board_size = 0.9f * std::min(screen_dimensions.x, screen_dimensions.y);
+    const auto board_centre = screen_dimensions / 2.0f;
     const auto cell_size = board_size / board.size();
     const auto top_left = board_centre - glm::vec2{board_size, board_size} / 2.0f;
 

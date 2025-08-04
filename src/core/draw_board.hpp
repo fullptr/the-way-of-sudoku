@@ -1,6 +1,5 @@
 #pragma once
 #include "renderer.hpp"
-#include "window.hpp"
 #include "sudoku.hpp"
 #include "utility.hpp"
 
@@ -42,7 +41,7 @@ using board_render_state = std::variant<
 
 auto draw_board(
     renderer& r,
-    const window& w,
+    glm::vec2 screen_dimensions,
     const sudoku_board& board,
     const board_render_state& state,
     const time_point& now

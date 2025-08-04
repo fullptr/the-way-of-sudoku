@@ -454,7 +454,7 @@ auto scene_game(sudoku::window& window) -> next_state
             }
         }
 
-        draw_board(renderer, window, board, state, timer.now());
+        draw_board(renderer, {window.width(), window.height()}, board, state, timer.now());
         
         if (ui.button("Back", {0, 0}, 200, 50, 3)) {
             return next_state::main_menu;
