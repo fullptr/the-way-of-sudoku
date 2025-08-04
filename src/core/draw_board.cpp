@@ -101,24 +101,25 @@ auto draw_border(renderer& r, const render_config& config)
     r.push_line(config.bl, config.tl, from_hex(0xecf0f1), 2.5f);
 }
 
+auto ease_out_quint(f32 x) -> f32
+{
+    return clamp(1.0f - std::pow(1.0f - x, 5.0f), 0.0f, 1.0f);
+}
+
 // draw digits
 auto draw_digits(renderer& r, const sudoku_board& board, const board_render_state& state, const render_config& config)
 {
     for (int y = 0; y != board.size(); ++y) {
         for (int x = 0; x != board.size(); ++x) {
             const auto cell_top_left = config.tl + config.cell_size * glm::vec2{x, y};
-            const auto cell_centre = cell_top_left + glm::vec2{config.cell_size, config.cell_size} / 2.0f;
 
             const auto& cell = board.at(x, y);
             if (cell.value.has_value()) {
                 auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
                 auto scale = 6;
                 if (auto inner = std::get_if<solved_rs>(&state)) {
-                    colour = from_hex(0x2ecc71);
                     const auto dt = std::chrono::duration<double>(config.now - inner->time).count();
-                    if (dt > 0.5) {
-                        scale = 7;
-                    }
+                    colour = lerp(colour, from_hex(0x2ecc71), ease_out_quint(dt));
                 }
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, config.cell_size, config.cell_size, scale, colour);
                 continue; // only render the main digit if it's given

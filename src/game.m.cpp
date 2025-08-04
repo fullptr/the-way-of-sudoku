@@ -305,7 +305,7 @@ auto scene_game(sudoku::window& window) -> next_state
 
     auto state = board_render_state{ normal_rs{} };
 
-#define LEVEL 2
+#define LEVEL 3
 #if LEVEL == 0
     auto board = make_board(
         {
@@ -364,6 +364,20 @@ auto scene_game(sudoku::window& window) -> next_state
             "33442",
             "33422",
             "55555"
+        }
+    );
+#elif LEVEL == 3
+    auto board = make_board(
+        {
+            "..12",
+            "..3.",
+            ".3..",
+            "21.."
+        }, {
+            "1122",
+            "1122",
+            "3344",
+            "3344"
         }
     );
 #endif
