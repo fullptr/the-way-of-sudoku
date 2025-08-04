@@ -15,6 +15,7 @@ add_library(core STATIC
     input.cpp
     ui.cpp
     sudoku.cpp
+    draw_board.cpp
 )
 
 target_include_directories(core PUBLIC .)
