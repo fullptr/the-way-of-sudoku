@@ -1,5 +1,7 @@
 #include "draw_board.hpp"
 
+#include <ranges>
+
 namespace sudoku {
 namespace {
 
@@ -111,30 +113,32 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
                     colour = from_hex(0x2ecc71);
                 }
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, config.cell_size, config.cell_size, scale, colour);
-            } else {
-                if (!cell.centre_pencil_marks.empty()) {
-                    const auto colour = colour_added_digits;
-                    auto s = std::string{};
-                    for (auto mark : cell.centre_pencil_marks) {
-                        s.append(std::to_string(mark));
-                    }
-                    const auto length = 2 * r.font().length_of(s);
-                    const auto scale = length > config.cell_size ? 1 : 2;
-                    r.push_text_box(s, cell_top_left, config.cell_size, config.cell_size, scale, colour);
+                continue; // only render the main digit if it's given
+            }
+
+            const auto colour = colour_added_digits;
+
+            if (!cell.centre_pencil_marks.empty()) {
+                auto s = std::string{};
+                for (auto mark : cell.centre_pencil_marks) {
+                    s.append(std::to_string(mark));
                 }
-                if (!cell.corner_pencil_marks.empty()) {
-                    const auto colour = colour_added_digits;
-                    auto s = std::string{};
-                    for (auto mark : cell.corner_pencil_marks) {
-                        s.append(std::to_string(mark));
-                    }
-                    const auto length = 2 * r.font().length_of(s);
-                    const auto scale = length > config.cell_size ? 1 : 2;
-                    auto pos = cell_top_left;
-                    pos.x += (i32)(config.cell_size * 0.1f);
-                    pos.y += (i32)(config.cell_size * 0.1f) + r.font().height * scale;
-                    r.push_text(s, pos, scale, colour);
+                const auto length = 2 * r.font().length_of(s);
+                const auto scale = length > config.cell_size ? 1 : 2;
+                r.push_text_box(s, cell_top_left, config.cell_size, config.cell_size, scale, colour);
+            }
+
+            if (!cell.corner_pencil_marks.empty()) {
+                auto s = std::string{};
+                for (auto mark : cell.corner_pencil_marks) {
+                    s.append(std::to_string(mark));
                 }
+                const auto length = 2 * r.font().length_of(s);
+                const auto scale = length > config.cell_size ? 1 : 2;
+                auto pos = cell_top_left;
+                pos.x += (i32)(config.cell_size * 0.1f);
+                pos.y += (i32)(config.cell_size * 0.1f) + r.font().height * scale;
+                r.push_text(s, pos, scale, colour);
             }
         }
     }
