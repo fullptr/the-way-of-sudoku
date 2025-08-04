@@ -24,6 +24,8 @@ struct render_config
     glm::vec2 tr;
     glm::vec2 bl;
     glm::vec2 br;
+
+    time_point now;
 };
 
 // draw backboard
@@ -55,7 +57,7 @@ auto draw_highlighted(renderer& r, const sudoku_board& board, const render_confi
 }
 
 // draw constraints
-auto draw_constraints(renderer& r, const sudoku_board& board, const board_render_state& state, const render_config& config, const time_point& now)
+auto draw_constraints(renderer& r, const sudoku_board& board, const board_render_state& state, const render_config& config)
 {
     // should this be elsewhere? probably...
     if (auto inner = std::get_if<empty_cells_rs>(&state)) {
@@ -63,7 +65,7 @@ auto draw_constraints(renderer& r, const sudoku_board& board, const board_render
             for (int x = 0; x != board.size(); ++x) {
                 
                 if (inner->cells.contains(glm::ivec2{x, y})) {
-                    const auto t = std::chrono::duration<double>(now - inner->time).count();
+                    const auto t = std::chrono::duration<double>(config.now - inner->time).count();
                     auto cell_colour = from_hex(0xc0392b, 1 - t);
                     const auto cell_centre = config.tl + config.cell_size * glm::vec2{x + 0.5f, y + 0.5f};
                     r.push_quad(cell_centre, config.cell_size, config.cell_size, 0, cell_colour);
@@ -111,8 +113,12 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
             if (cell.value.has_value()) {
                 auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
                 auto scale = 6;
-                if (std::holds_alternative<solved_rs>(state)) {
+                if (auto inner = std::get_if<solved_rs>(&state)) {
                     colour = from_hex(0x2ecc71);
+                    const auto dt = std::chrono::duration<double>(config.now - inner->time).count();
+                    if (dt > 0.5) {
+                        scale = 7;
+                    }
                 }
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, config.cell_size, config.cell_size, scale, colour);
                 continue; // only render the main digit if it's given
@@ -130,7 +136,6 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
 
             if (!cell.corner_pencil_marks.empty()) {
                 auto s = std::string{};
-                std::erase(s, 'c');
                 for (auto mark : cell.corner_pencil_marks) {
                     s.append(std::to_string(mark));
                 }
@@ -165,12 +170,13 @@ void draw_board(
         .tl = top_left,
         .tr = top_left + glm::vec2{board_size, 0},
         .bl = top_left + glm::vec2{0, board_size},
-        .br = top_left + glm::vec2{board_size, board_size}
+        .br = top_left + glm::vec2{board_size, board_size},
+        .now = now
     };
 
     draw_backboard(r, board, config);
     draw_highlighted(r, board, config);
-    draw_constraints(r, board, state, config, now);
+    draw_constraints(r, board, state, config);
     draw_border(r, config);
     draw_digits(r, board, state, config);
 }
