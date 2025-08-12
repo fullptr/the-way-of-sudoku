@@ -195,12 +195,50 @@ void sudoku_board::clear_selected()
 
 void sudoku_board::undo()
 {
+    const auto event = d_history.go_back();
+    if (!event) return;
 
+    for (const auto& [pos, change] : event->changes) {
+        if (change.changed) {
+            get(pos).value = change.from;
+        }
+        for (const auto val : change.centre_marks_added) {
+            get(pos).centre_pencil_marks.erase(val);
+        }
+        for (const auto val : change.centre_marks_removed) {
+            get(pos).centre_pencil_marks.insert(val);
+        }
+        for (const auto val : change.corner_marks_added) {
+            get(pos).centre_pencil_marks.erase(val);
+        }
+        for (const auto val : change.corner_marks_removed) {
+            get(pos).centre_pencil_marks.insert(val);
+        }
+    }
 }
 
 void sudoku_board::redo()
 {
+    const auto event = d_history.go_forward();
+    if (!event) return;
 
+    for (const auto& [pos, change] : event->changes) {
+        if (change.changed) {
+            get(pos).value = change.to;
+        }
+        for (const auto val : change.centre_marks_added) {
+            get(pos).centre_pencil_marks.insert(val);
+        }
+        for (const auto val : change.centre_marks_removed) {
+            get(pos).centre_pencil_marks.erase(val);
+        }
+        for (const auto val : change.corner_marks_added) {
+            get(pos).centre_pencil_marks.insert(val);
+        }
+        for (const auto val : change.corner_marks_removed) {
+            get(pos).centre_pencil_marks.erase(val);
+        }
+    }
 }
 
 auto sudoku_board::size() const -> u64

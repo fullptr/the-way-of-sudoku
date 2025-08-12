@@ -306,6 +306,16 @@ auto scene_game(sudoku::window& window) -> next_state
             else if (auto e = event.get_if<keyboard_pressed_event>()) {
                 std::optional<i32> value = {};
                 switch (e->key) {
+                    case keyboard::Z: {
+                        if (e->mods & modifier::ctrl) {
+                            board.undo();
+                        }
+                    } break;
+                    case keyboard::Y: {
+                        if (e->mods & modifier::ctrl) {
+                            board.redo();
+                        }
+                    } break;
                     case keyboard::backspace: {
                         board.clear_selected();
                     } break;

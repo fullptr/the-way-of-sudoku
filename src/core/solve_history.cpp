@@ -11,7 +11,6 @@ void solve_history::add_event(const edit_event& event)
     }
     d_events.push_back(event);
     d_curr = d_events.size();
-    std::print("added event!\n");
 }
 
 auto solve_history::go_back() -> std::optional<edit_event>
