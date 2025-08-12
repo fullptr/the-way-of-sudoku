@@ -265,7 +265,7 @@ auto scene_game(sudoku::window& window) -> next_state
                 continue; // Don't allow updating the board when it's solved
             }
 
-            if (auto e = event.get_if<mouse_pressed_event>()) {
+            if (const auto e = event.get_if<mouse_pressed_event>()) {
                 const auto pos = hovered_cell_pos(board, window);
                 if (pos.has_value() && board.valid(*pos)) {
                     if (e->button == mouse::left) {
@@ -281,12 +281,12 @@ auto scene_game(sudoku::window& window) -> next_state
                     board.unselect_all();
                 }
             }
-            else if (auto e = event.get_if<mouse_released_event>()) {
+            else if (const auto e = event.get_if<mouse_released_event>()) {
                 if (e->button == mouse::left) {
                     mouse_down = {};
                 }
             }
-            else if (auto e = event.get_if<mouse_moved_event>()) {
+            else if (const auto e = event.get_if<mouse_moved_event>()) {
                 if (mouse_down.has_value()) {
                     auto cell = hovered_cell_pos(board, window);
                     if (cell.has_value() && board.valid(*cell)) {
@@ -294,7 +294,7 @@ auto scene_game(sudoku::window& window) -> next_state
                     }
                 }
             }
-            else if (auto e = event.get_if<keyboard_pressed_event>()) {
+            else if (const auto e = event.get_if<keyboard_pressed_event>()) {
                 std::optional<i32> value = {};
                 switch (e->key) {
                     case keyboard::Z: {
@@ -334,6 +334,20 @@ auto scene_game(sudoku::window& window) -> next_state
                 }
                 else {
                     board.set_digit(*value);
+                }
+            }
+            else if (auto e = event.get_if<keyboard_held_event>()) {
+                switch (e->key) {
+                    case keyboard::Z: {
+                        if (e->mods & modifier::ctrl) {
+                            board.undo();
+                        }
+                    } break;
+                    case keyboard::Y: {
+                        if (e->mods & modifier::ctrl) {
+                            board.redo();
+                        }
+                    } break;
                 }
             }
         }
