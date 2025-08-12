@@ -1,8 +1,11 @@
 #pragma once
 #include <vector>
 #include <optional>
+#include <unordered_set>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
+#include <glm/gtx/hash.hpp>
 
 namespace sudoku {
 
@@ -15,9 +18,9 @@ enum class edit_type
 
 struct edit_event
 {
-    edit_type  type;
-    bool       added;
-    glm::ivec2 pos;  
+    edit_type                      type;
+    bool                           added;
+    std::unordered_set<glm::ivec2> positions;  
 };
 
 class solve_history

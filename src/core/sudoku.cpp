@@ -8,32 +8,78 @@ sudoku_board::sudoku_board(u64 size)
 {
 }
 
-auto sudoku_board::at(i32 x, i32 y) -> sudoku_cell& {
-    assert(valid(x, y));
-    return d_cells[x + y * d_size];
+auto sudoku_board::get(glm::ivec2 pos) -> sudoku_cell&
+{
+    assert(valid(pos));
+    return d_cells[pos.x + pos.y * d_size];
 }
 
-auto sudoku_board::at(i32 x, i32 y) const -> const sudoku_cell& {
-    assert(valid(x, y));
-    return d_cells[x + y * d_size];
+auto sudoku_board::at(glm::ivec2 pos) const -> const sudoku_cell&
+{
+    assert(valid(pos));
+    return d_cells[pos.x + pos.y * d_size];
 }
 
-auto sudoku_board::size() const -> u64 {
+auto sudoku_board::select(glm::ivec2 pos, bool value) -> void
+{
+    assert(valid(pos));
+    get(pos).selected = value;
+}
+
+auto sudoku_board::toggle_selected(glm::ivec2 pos) -> void
+{
+    assert(valid(pos));
+    auto& cell = get(pos);
+    cell.selected = !cell.selected;
+}
+
+auto sudoku_board::set_digit(i32 value) -> void
+{
+    for (auto& cell : d_cells) {
+        if (cell.selected && !cell.fixed) {
+            cell.value = value;
+        }
+    }
+}
+
+auto sudoku_board::set_corner_pencil_mark(i32 value) -> void
+{
+    for (auto& cell : d_cells) {
+        if (cell.selected && !cell.fixed) {
+            cell.corner_pencil_marks.insert(value);
+        }
+    }
+}
+
+auto sudoku_board::set_centre_pencil_mark(i32 value) -> void
+{
+    for (auto& cell : d_cells) {
+        if (cell.selected && !cell.fixed) {
+            cell.centre_pencil_marks.insert(value);
+        }
+    }
+}
+
+
+auto sudoku_board::size() const -> u64
+{
     return d_size;
 }
 
-auto sudoku_board::valid(i32 x, i32 y) -> bool {
-    return 0 <= x && x < d_size && 0 <= y && y < d_size;
+auto sudoku_board::valid(glm::ivec2 pos) -> bool
+{
+    return 0 <= pos.x && pos.x < d_size && 0 <= pos.y && pos.y < d_size;
 }
 
-auto sudoku_board::clear_selected() -> void {
+auto sudoku_board::clear_selected() -> void 
+{
     for (auto& cell : d_cells) cell.selected = false;
 }
 
 auto sudoku_board::cells() -> std::vector<sudoku_cell>& { return d_cells; }
 auto sudoku_board::cells() const -> const std::vector<sudoku_cell>& { return d_cells; }
 
-auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
+auto sudoku_board::make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
 {
     const auto size = cells.size();
     if (regions.size() != size) {
@@ -51,10 +97,10 @@ auto make_board(std::vector<std::string_view> cells, std::vector<std::string_vie
         const auto& row = cells[y];
         for (int x = 0; x != row.size(); ++x) {
             if (row[x] != '.') {
-                board.at(x, y).value = static_cast<int>(row[x] - '0');
-                board.at(x, y).fixed = true;
+                board.get({x, y}).value = static_cast<int>(row[x] - '0');
+                board.get({x, y}).fixed = true;
             }
-            board.at(x, y).region = static_cast<i32>(regions[y][x] - '0');
+            board.get({x, y}).region = static_cast<i32>(regions[y][x] - '0');
         }
     }
     return board;

@@ -48,7 +48,7 @@ auto draw_highlighted(renderer& r, const sudoku_board& board, const render_confi
 {
     for (int y = 0; y != board.size(); ++y) {
         for (int x = 0; x != board.size(); ++x) {
-            if (board.at(x, y).selected) {
+            if (board.at({x, y}).selected) {
                 const auto cell_centre = config.tl + config.cell_size * glm::vec2{x + 0.5f, y + 0.5f};
                 r.push_quad(cell_centre, config.cell_size, config.cell_size, 0, colour_cell_hightlighted);
             }
@@ -77,13 +77,13 @@ auto draw_constraints(renderer& r, const sudoku_board& board, const board_render
     // draw the boundaries of the regions
     for (i32 x = 0; x != board.size(); ++x) {
         for (i32 y = 0; y != board.size(); ++y) {
-            if (x + 1 < board.size() && board.at(x, y).region != board.at(x + 1, y).region) {
+            if (x + 1 < board.size() && board.at({x, y}).region != board.at({x + 1, y}).region) {
                 const auto a = config.tl + config.cell_size * glm::vec2{x + 1, y};
                 const auto b = config.tl + config.cell_size * glm::vec2{x + 1, y + 1};
                 r.push_line(a, b, from_hex(0xecf0f1), 1.f);
             }
 
-            if (y + 1 < board.size() && board.at(x, y).region != board.at(x, y + 1).region) {
+            if (y + 1 < board.size() && board.at({x, y}).region != board.at({x, y + 1}).region) {
                 const auto a = config.tl + config.cell_size * glm::vec2{x,     y + 1};
                 const auto b = config.tl + config.cell_size * glm::vec2{x + 1, y + 1};
                 r.push_line(a, b, from_hex(0xecf0f1), 1.f);
@@ -119,7 +119,7 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
         for (int x = 0; x != board.size(); ++x) {
             const auto cell_top_left = config.tl + config.cell_size * glm::vec2{x, y};
 
-            const auto& cell = board.at(x, y);
+            const auto& cell = board.at({x, y});
             if (cell.value.has_value()) {
                 auto colour = cell.fixed ? colour_given_digits : colour_added_digits;
                 auto scale = 6;

@@ -6,6 +6,7 @@
 #include "ui.hpp"
 #include "sudoku.hpp"
 #include "draw_board.hpp"
+#include "solve_history.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -53,15 +54,6 @@ auto hovered_cell_pos(const sudoku_board& board, const window& w) -> std::option
     return {};
 }
 
-auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
-{
-    const auto pos = hovered_cell_pos(board, w);
-    if (pos.has_value()) {
-        return &board.at(pos->x, pos->y);
-    }
-    return nullptr;
-}
-
 auto check_solution(const sudoku_board& board, time_point time) -> board_render_state
 {
     auto empty_cells = empty_cells_rs{};
@@ -70,7 +62,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     // check for empty cells
     for (i32 row = 0; row != board.size(); ++row) {
         for (i32 col = 0; col != board.size(); ++col) {
-            const auto val = board.at(row, col).value;
+            const auto val = board.at({row, col}).value;
             if (!val.has_value()) empty_cells.cells.insert(glm::ivec2{row, col});
         }
     }
@@ -82,7 +74,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     for (i32 row = 0; row != board.size(); ++row) {
         std::unordered_set<i32> seen; 
         for (i32 col = 0; col != board.size(); ++col) {
-            const auto val = board.at(row, col).value;
+            const auto val = board.at({row, col}).value;
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return constraint_faiure_rs{}; // duplicate values in the row
@@ -92,7 +84,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     for (i32 col = 0; col != board.size(); ++col) {
         std::unordered_set<i32> seen; 
         for (i32 row = 0; row != board.size(); ++row) {
-            const auto val = board.at(row, col).value;
+            const auto val = board.at({row, col}).value;
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return constraint_faiure_rs{}; // duplicate values in the row
@@ -102,8 +94,8 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     std::unordered_map<i32, std::unordered_set<i32>> regions;
     for (i32 row = 0; row != board.size(); ++row) {
         for (i32 col = 0; col != board.size(); ++col) {
-            if (board.at(row, col).region.has_value()) {
-                regions[*board.at(row,col).region].insert(*board.at(row, col).value);
+            if (board.at({row, col}).region.has_value()) {
+                regions[*board.at({row, col}).region].insert(*board.at({row, col}).value);
             }
         }
     }
@@ -302,12 +294,13 @@ auto scene_game(sudoku::window& window) -> next_state
     auto timer    = sudoku::timer{};
     auto renderer = sudoku::renderer{};
     auto ui       = sudoku::ui_engine{&renderer};
+    auto history  = sudoku::solve_history{};
 
     auto state = board_render_state{ normal_rs{} };
 
 #define LEVEL 3
 #if LEVEL == 0
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             "2..91.568",
             "...2541..",
@@ -331,7 +324,7 @@ auto scene_game(sudoku::window& window) -> next_state
         }
     );
 #elif LEVEL == 1
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             "..57341",
             "54..217",
@@ -351,7 +344,7 @@ auto scene_game(sudoku::window& window) -> next_state
         }
     );
 #elif LEVEL == 2
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             ".5...",
             "...3.",
@@ -367,7 +360,7 @@ auto scene_game(sudoku::window& window) -> next_state
         }
     );
 #elif LEVEL == 3
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             "..12",
             "..3.",
@@ -400,16 +393,16 @@ auto scene_game(sudoku::window& window) -> next_state
             }
 
             if (auto e = event.get_if<mouse_pressed_event>()) {
-                auto cell = hovered_cell(board, window);
-                if (cell != nullptr) {
+                const auto pos = hovered_cell_pos(board, window);
+                if (pos.has_value() && board.valid(*pos)) {
                     if (e->button == mouse::left) {
                         if (e->mods & modifier::shift) {
-                            cell->selected = !cell->selected;
+                            board.toggle_selected(*pos);
                         } else {
                             board.clear_selected();
-                            cell->selected = true;
+                            board.select(*pos, true);
                         }
-                        mouse_down = cell->selected;
+                        mouse_down = std::as_const(board).at(*pos).selected;
                     }
                 } else {
                     board.clear_selected();
@@ -422,9 +415,9 @@ auto scene_game(sudoku::window& window) -> next_state
             }
             else if (auto e = event.get_if<mouse_moved_event>()) {
                 if (mouse_down.has_value()) {
-                    auto cell = hovered_cell(board, window);
-                    if (cell != nullptr) {
-                        cell->selected = *mouse_down;
+                    auto cell = hovered_cell_pos(board, window);
+                    if (cell.has_value() && board.valid(*cell)) {
+                        board.select(*cell, *mouse_down);
                     }
                 }
             }
