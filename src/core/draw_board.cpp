@@ -101,9 +101,15 @@ auto draw_border(renderer& r, const render_config& config)
     r.push_line(config.bl, config.tl, from_hex(0xecf0f1), 2.5f);
 }
 
-auto ease_out_quint(f32 x) -> f32
+auto ease_out_quint(f32 time) -> f32
 {
-    return clamp(1.0f - std::pow(1.0f - x, 5.0f), 0.0f, 1.0f);
+    return clamp(1.0f - std::pow(1.0f - time, 5.0f), 0.0f, 1.0f);
+}
+
+auto solved_ease(f32 time, f32 delay) -> f32
+{
+    if (time < delay) return 0.0f;
+    return ease_out_quint(time - delay);
 }
 
 // draw digits
@@ -119,7 +125,7 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
                 auto scale = 6;
                 if (auto inner = std::get_if<solved_rs>(&state)) {
                     const auto dt = std::chrono::duration<double>(config.now - inner->time).count();
-                    colour = lerp(colour, from_hex(0x2ecc71), ease_out_quint(dt));
+                    colour = lerp(colour, from_hex(0x2ecc71), solved_ease(dt, 0.1f * float(x + y)));
                 }
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, config.cell_size, config.cell_size, scale, colour);
                 continue; // only render the main digit if it's given
