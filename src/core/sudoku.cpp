@@ -51,7 +51,7 @@ auto sudoku_board::set_digit(i32 value) -> void
         for (i32 y = 0; y != d_size; ++y) {
             auto& cell = get({x, y});
             if (cell.selected && !cell.fixed) {
-                event.changes[{x, y}].changed = true;
+                event.changes[{x, y}].changed = cell.value != value;
                 event.changes[{x, y}].from = cell.value;
                 event.changes[{x, y}].to = value;
                 cell.value = value;
@@ -81,12 +81,12 @@ auto sudoku_board::set_corner_pencil_mark(i32 value) -> void
     for_each_selected([&](int x, int y, sudoku_cell& cell) {
         if (add) {
             if (!cell.corner_pencil_marks.contains(value)) {
-                event.changes[{x, y}].corner_marks_added.insert({x, y});
+                event.changes[{x, y}].corner_marks_added.insert(value);
                 cell.corner_pencil_marks.insert(value);
             }
         } else {
             if (cell.corner_pencil_marks.contains(value)) {
-                event.changes[{x, y}].corner_marks_removed.insert({x, y});
+                event.changes[{x, y}].corner_marks_removed.insert(value);
                 cell.corner_pencil_marks.erase(value);
             }
         }
@@ -114,12 +114,12 @@ auto sudoku_board::set_centre_pencil_mark(i32 value) -> void
     for_each_selected([&](int x, int y, sudoku_cell& cell) {
         if (add) {
             if (!cell.centre_pencil_marks.contains(value)) {
-                event.changes[{x, y}].centre_marks_added.insert({x, y});
+                event.changes[{x, y}].centre_marks_added.insert(value);
                 cell.centre_pencil_marks.insert(value);
             }
         } else {
             if (cell.centre_pencil_marks.contains(value)) {
-                event.changes[{x, y}].centre_marks_removed.insert({x, y});
+                event.changes[{x, y}].centre_marks_removed.insert(value);
                 cell.centre_pencil_marks.erase(value);
             }
         }
@@ -160,10 +160,10 @@ void sudoku_board::clear_selected()
         case delete_kind::digit: {
             for_each_selected([&](int x, int y, sudoku_cell& cell) {
                 if (cell.selected && !cell.fixed) {
-                    event.changes[{x, y}].changed = true;
+                    event.changes[{x, y}].changed = cell.value != std::nullopt;
                     event.changes[{x, y}].from = cell.value;
-                    event.changes[{x, y}].to = {};
-                    cell.value = {};
+                    event.changes[{x, y}].to = std::nullopt;
+                    cell.value = std::nullopt;
                 }
             });
         } break;
@@ -180,7 +180,7 @@ void sudoku_board::clear_selected()
         case delete_kind::corner: {
             for_each_selected([&](int x, int y, sudoku_cell& cell) {
                 if (cell.selected && !cell.fixed) {
-                    for (auto value : cell.centre_pencil_marks) {
+                    for (auto value : cell.corner_pencil_marks) {
                         event.changes[{x, y}].corner_marks_removed.insert(value);
                     }
                     cell.corner_pencil_marks.clear();
@@ -209,10 +209,10 @@ void sudoku_board::undo()
             get(pos).centre_pencil_marks.insert(val);
         }
         for (const auto val : change.corner_marks_added) {
-            get(pos).centre_pencil_marks.erase(val);
+            get(pos).corner_pencil_marks.erase(val);
         }
         for (const auto val : change.corner_marks_removed) {
-            get(pos).centre_pencil_marks.insert(val);
+            get(pos).corner_pencil_marks.insert(val);
         }
     }
 }
@@ -233,10 +233,10 @@ void sudoku_board::redo()
             get(pos).centre_pencil_marks.erase(val);
         }
         for (const auto val : change.corner_marks_added) {
-            get(pos).centre_pencil_marks.insert(val);
+            get(pos).corner_pencil_marks.insert(val);
         }
         for (const auto val : change.corner_marks_removed) {
-            get(pos).centre_pencil_marks.erase(val);
+            get(pos).corner_pencil_marks.erase(val);
         }
     }
 }
