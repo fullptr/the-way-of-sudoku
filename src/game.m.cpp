@@ -115,40 +115,6 @@ void flip(std::set<i32>& ints, i32 value)
     }
 }
 
-void update_centre_pencil_mark(sudoku_board& board, i32 value)
-{
-    // If any of the cells can accept the pencil mark, we are adding, otherwise
-    // we are removing
-    bool add = false;
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.centre_pencil_marks.contains(value)) {
-                add = true;
-                break;
-            }
-        }
-    }
-
-    board.set_centre_pencil_mark(value, add);
-}
-
-void update_corner_pencil_mark(sudoku_board& board, i32 value)
-{
-    // If any of the cells can accept the pencil mark, we are adding, otherwise
-    // we are removing
-    bool add = false;
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.corner_pencil_marks.contains(value)) {
-                add = true;
-                break;
-            }
-        }
-    }
-
-    board.set_corner_pencil_mark(value, add);
-}
-
 auto has_any_value(const sudoku_board& board) -> bool
 {
     for (auto& cell : board.cells()) {
@@ -398,10 +364,10 @@ auto scene_game(sudoku::window& window) -> next_state
                 if (*value > board.size()) continue; // not a digit in the grid
 
                 if (e->mods & modifier::ctrl) {
-                    update_centre_pencil_mark(board, *value);
+                    board.set_centre_pencil_mark(*value);
                 }
                 else if (e->mods & modifier::shift) {
-                    update_corner_pencil_mark(board, *value);
+                    board.set_corner_pencil_mark(*value);
                 }
                 else {
                     board.set_digit(*value);

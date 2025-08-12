@@ -42,8 +42,20 @@ auto sudoku_board::set_digit(i32 value) -> void
     }
 }
 
-auto sudoku_board::set_corner_pencil_mark(i32 value, bool add) -> void
+auto sudoku_board::set_corner_pencil_mark(i32 value) -> void
 {
+    // If any of the cells can accept the pencil mark, we are adding, otherwise
+    // we are removing
+    bool add = false;
+    for (auto& cell : d_cells) {
+        if (cell.selected && !cell.fixed) {
+            if (!cell.corner_pencil_marks.contains(value)) {
+                add = true;
+                break;
+            }
+        }
+    }
+
     for (auto& cell : d_cells) {
         if (cell.selected && !cell.fixed) {
             if (add) {
@@ -55,8 +67,20 @@ auto sudoku_board::set_corner_pencil_mark(i32 value, bool add) -> void
     }
 }
 
-auto sudoku_board::set_centre_pencil_mark(i32 value, bool add) -> void
+auto sudoku_board::set_centre_pencil_mark(i32 value) -> void
 {
+    // If any of the cells can accept the pencil mark, we are adding, otherwise
+    // we are removing
+    bool add = false;
+    for (auto& cell : d_cells) {
+        if (cell.selected && !cell.fixed) {
+            if (!cell.centre_pencil_marks.contains(value)) {
+                add = true;
+                break;
+            }
+        }
+    }
+
     for (auto& cell : d_cells) {
         if (cell.selected && !cell.fixed) {
             if (add) {

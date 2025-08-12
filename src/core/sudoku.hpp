@@ -46,8 +46,8 @@ public:
     void unselect_all();
 
     void set_digit(i32 value);
-    void set_corner_pencil_mark(i32 value, bool add);
-    void set_centre_pencil_mark(i32 value, bool add);  
+    void set_corner_pencil_mark(i32 value);
+    void set_centre_pencil_mark(i32 value);  
     
     void clear_digits();
     void clear_corner_pencil_marks();
