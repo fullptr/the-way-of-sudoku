@@ -87,19 +87,6 @@ auto lerp(const T& a, const T& b, float t) -> T
     return t * b + (1 - t) * a;
 };
 
-struct camera;
-class input;
-auto mouse_pos_world_space(const input& in, const camera& c) -> glm::vec2;
-auto pixel_at_mouse(const input& in, const camera& c) -> pixel_pos;
-
-auto pixel_to_physics(pixel_pos px) -> b2Vec2;
-auto pixel_to_physics(glm::vec2 px) -> b2Vec2;
-auto pixel_to_physics(float px) -> float;
-
-// Converts a point in world space to pixel space
-auto physics_to_pixel(b2Vec2 px) -> glm::vec2;
-auto physics_to_pixel(float px) -> float;
-
 inline auto to_string(glm::ivec2 v) -> std::string
 {
     return std::format("glm::ivec2{{{}, {}}}", v.x, v.y);

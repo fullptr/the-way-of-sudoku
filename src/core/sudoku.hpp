@@ -1,4 +1,6 @@
 #pragma once
+#include "common.hpp"
+
 #include <optional>
 #include <vector>
 #include <unordered_set>
@@ -33,62 +35,21 @@ class sudoku_board
     std::vector<sudoku_cell>       d_cells;
 
 public:
-    sudoku_board(u64 size)
-        : d_size{size}, d_cells{size * size}
-    {
-    }
+    sudoku_board(u64 size);
 
-    auto at(i32 x, i32 y) -> sudoku_cell& {
-        assert(valid(x, y));
-        return d_cells[x + y * d_size];
-    }
+    auto at(i32 x, i32 y) -> sudoku_cell&;
+    auto at(i32 x, i32 y) const -> const sudoku_cell&;
 
-    auto at(i32 x, i32 y) const -> const sudoku_cell& {
-        assert(valid(x, y));
-        return d_cells[x + y * d_size];
-    }
+    auto size() const -> u64;
 
-    auto size() const -> u64 {
-        return d_size;
-    }
+    auto valid(i32 x, i32 y) -> bool;
 
-    auto valid(i32 x, i32 y) -> bool {
-        return 0 <= x && x < d_size && 0 <= y && y < d_size;
-    }
+    auto clear_selected() -> void;
 
-    auto clear_selected() -> void {
-        for (auto& cell : d_cells) cell.selected = false;
-    }
-
-    auto cells() -> std::vector<sudoku_cell>& { return d_cells; }
-    auto cells() const -> const std::vector<sudoku_cell>& { return d_cells; }
+    auto cells() -> std::vector<sudoku_cell>&;
+    auto cells() const -> const std::vector<sudoku_cell>&;
 };
 
-inline auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board
-{
-    const auto size = cells.size();
-    if (regions.size() != size) {
-        std::print("make_board failed - regions don't align\n");
-        std::exit(1);
-    }
-    for (const auto& row : cells) {
-        if (row.size() != size) {
-            std::print("make_board failed - not a square!\n");
-            std::exit(1);
-        }
-    }
-    auto board = sudoku_board{size};
-    for (int y = 0; y != size; ++y) {
-        const auto& row = cells[y];
-        for (int x = 0; x != row.size(); ++x) {
-            if (row[x] != '.') {
-                board.at(x, y).value = static_cast<int>(row[x] - '0');
-                board.at(x, y).fixed = true;
-            }
-            board.at(x, y).region = static_cast<i32>(regions[y][x] - '0');
-        }
-    }
-    return board;
-}
+auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board;
 
 }
