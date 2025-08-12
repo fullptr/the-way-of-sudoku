@@ -51,11 +51,8 @@ auto sudoku_board::set_digit(i32 value) -> void
         for (i32 y = 0; y != d_size; ++y) {
             auto& cell = get({x, y});
             if (cell.selected && !cell.fixed) {
-                event.diffs.push_back(diff{
-                    .pos = {x, y},
-                    .kind = diff_kind::digit,
-                    .old_value = cell.value,
-                    .new_value = value
+                event.diffs.emplace_back(digit_diff{
+                    .pos = {x, y}, .old_value = cell.value, .new_value = value
                 });
                 cell.value = value;
             }
@@ -84,21 +81,19 @@ auto sudoku_board::set_corner_pencil_mark(i32 value) -> void
     for_each_selected([&](int x, int y, sudoku_cell& cell) {
         if (add) {
             if (!cell.corner_pencil_marks.contains(value)) {
-                event.diffs.push_back(diff{
+                event.diffs.emplace_back(corner_diff{
                     .pos = {x, y},
-                    .kind = diff_kind::corner,
-                    .old_value = {},
-                    .new_value = value
+                    .added = true,
+                    .values = {value}
                 });
                 cell.corner_pencil_marks.insert(value);
             }
         } else {
             if (cell.corner_pencil_marks.contains(value)) {
-                event.diffs.push_back(diff{
+                event.diffs.emplace_back(corner_diff{
                     .pos = {x, y},
-                    .kind = diff_kind::corner,
-                    .old_value = value,
-                    .new_value = {}
+                    .added = false,
+                    .values = {value}
                 });
                 cell.corner_pencil_marks.erase(value);
             }
@@ -127,21 +122,19 @@ auto sudoku_board::set_centre_pencil_mark(i32 value) -> void
     for_each_selected([&](int x, int y, sudoku_cell& cell) {
         if (add) {
             if (!cell.centre_pencil_marks.contains(value)) {
-                event.diffs.push_back(diff{
+                event.diffs.emplace_back(centre_diff{
                     .pos = {x, y},
-                    .kind = diff_kind::centre,
-                    .old_value = {},
-                    .new_value = value
+                    .added = true,
+                    .values = {value}
                 });
                 cell.centre_pencil_marks.insert(value);
             }
         } else {
             if (cell.centre_pencil_marks.contains(value)) {
-                event.diffs.push_back(diff{
+                event.diffs.emplace_back(centre_diff{
                     .pos = {x, y},
-                    .kind = diff_kind::centre,
-                    .old_value = value,
-                    .new_value = {}
+                    .added = false,
+                    .values = {value}
                 });
                 cell.centre_pencil_marks.erase(value);
             }
@@ -182,45 +175,26 @@ void sudoku_board::clear_selected()
     switch (find_deletion_kind()) {
         case delete_kind::digit: {
             for_each_selected([&](int x, int y, sudoku_cell& cell) {
-                if (cell.selected && !cell.fixed) {
-                    event.diffs.push_back(diff{
-                        .pos = {x, y},
-                        .kind = diff_kind::digit,
-                        .old_value = cell.value,
-                        .new_value = {}
-                    });
-                    cell.value = std::nullopt;
-                }
+                event.diffs.emplace_back(digit_diff{
+                    .pos = {x, y}, .old_value = cell.value, .new_value = {}
+                });
+                cell.value = std::nullopt;
             });
         } break;
         case delete_kind::centre: {
             for_each_selected([&](int x, int y, sudoku_cell& cell) {
-                if (cell.selected && !cell.fixed) {
-                    for (auto value : cell.centre_pencil_marks) {
-                        event.diffs.push_back(diff{
-                            .pos = {x, y},
-                            .kind = diff_kind::centre,
-                            .old_value = value,
-                            .new_value = {}
-                        });
-                    }
-                    cell.centre_pencil_marks.clear();
-                }
+                event.diffs.emplace_back(centre_diff{
+                    .pos = {x, y}, .added = false, .values = cell.centre_pencil_marks
+                });
+                cell.centre_pencil_marks.clear();
             });
         } break;
         case delete_kind::corner: {
             for_each_selected([&](int x, int y, sudoku_cell& cell) {
-                if (cell.selected && !cell.fixed) {
-                    for (auto value : cell.corner_pencil_marks) {
-                        event.diffs.push_back(diff{
-                            .pos = {x, y},
-                            .kind = diff_kind::corner,
-                            .old_value = value,
-                            .new_value = {}
-                        });
-                    }
-                    cell.corner_pencil_marks.clear();
-                }
+                event.diffs.emplace_back(corner_diff{
+                    .pos = {x, y}, .added = false, .values = cell.corner_pencil_marks
+                });
+                cell.corner_pencil_marks.clear();
             });
         } break;
         case delete_kind::none: {} break;
@@ -229,33 +203,34 @@ void sudoku_board::clear_selected()
     d_history.add_event(event);
 }
 
+auto update_set(std::set<i32>& dst, const std::set<i32>& src, bool add)
+{
+    for (const auto value : src) {
+        if (add) {
+            dst.insert(value);
+        } else {
+            dst.erase(value);
+        }
+    }
+}
+
 void sudoku_board::undo()
 {
     const auto event = d_history.go_back();
     if (!event) return;
 
     for (const auto& diff : event->diffs) {
-        switch (diff.kind) {
-            case diff_kind::digit: {
+        std::visit(overloaded{
+            [&](const digit_diff& diff) {
                 get(diff.pos).value = diff.old_value;
-            } break;
-            case diff_kind::centre: {
-                if (diff.new_value) { // added
-                    get(diff.pos).centre_pencil_marks.erase(*diff.new_value);
-                }
-                if (diff.old_value) { // removed
-                    get(diff.pos).centre_pencil_marks.insert(*diff.old_value);
-                }
-            } break;
-            case diff_kind::corner: {
-                if (diff.new_value) { // added
-                    get(diff.pos).corner_pencil_marks.erase(*diff.new_value);
-                }
-                if (diff.old_value) { // removed
-                    get(diff.pos).corner_pencil_marks.insert(*diff.old_value);
-                }
-            } break;
-        }
+            },
+            [&](const centre_diff& diff) {
+                update_set(get(diff.pos).centre_pencil_marks, diff.values, !diff.added);
+            },
+            [&](const corner_diff& diff) {
+                update_set(get(diff.pos).corner_pencil_marks, diff.values, !diff.added);
+            }
+        }, diff);
     }
 }
 
@@ -265,27 +240,17 @@ void sudoku_board::redo()
     if (!event) return;
 
     for (const auto& diff : event->diffs) {
-        switch (diff.kind) {
-            case diff_kind::digit: {
+        std::visit(overloaded{
+            [&](const digit_diff& diff) {
                 get(diff.pos).value = diff.new_value;
-            } break;
-            case diff_kind::centre: {
-                if (diff.new_value) { // added
-                    get(diff.pos).centre_pencil_marks.insert(*diff.new_value);
-                }
-                if (diff.old_value) { // removed
-                    get(diff.pos).centre_pencil_marks.erase(*diff.old_value);
-                }
-            } break;
-            case diff_kind::corner: {
-                if (diff.new_value) { // added
-                    get(diff.pos).corner_pencil_marks.insert(*diff.new_value);
-                }
-                if (diff.old_value) { // removed
-                    get(diff.pos).corner_pencil_marks.erase(*diff.old_value);
-                }
-            } break;
-        }
+            },
+            [&](const centre_diff& diff) {
+                update_set(get(diff.pos).centre_pencil_marks, diff.values, diff.added);
+            },
+            [&](const corner_diff& diff) {
+                update_set(get(diff.pos).corner_pencil_marks, diff.values, diff.added);
+            }
+        }, diff);
     }
 }
 

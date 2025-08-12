@@ -15,7 +15,7 @@ void dump_event(const edit_event& event)
 {
     std::print("event:\n");
     for (const auto& diff : event.diffs) {
-        std::print("  - pos = [{}, {}], kind = {}, old_value = {}, new_value = {}\n", diff.pos.x, diff.pos.y, (i32)diff.kind, to_string(diff.old_value), to_string(diff.new_value));
+        //std::print("  - pos = [{}, {}], kind = {}, old_value = {}, new_value = {}\n", diff.pos.x, diff.pos.y, (i32)diff.kind, to_string(diff.old_value), to_string(diff.new_value));
     }
 }
 

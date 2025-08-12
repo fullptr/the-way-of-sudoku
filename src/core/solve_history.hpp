@@ -3,27 +3,35 @@
 
 #include <vector>
 #include <optional>
-#include <unordered_map>
-#include <unordered_set>
+#include <set>
+#include <variant>
 
 #include <glm/glm.hpp>
 
 namespace sudoku {
 
-enum class diff_kind
+struct digit_diff
 {
-    digit,
-    centre,
-    corner,
-};
-
-struct diff
-{
-    glm::ivec2         pos;
-    diff_kind          kind;
+    glm::ivec2 pos;
     std::optional<i32> old_value;
     std::optional<i32> new_value;
 };
+
+struct centre_diff
+{
+    glm::ivec2    pos;
+    bool          added;
+    std::set<i32> values;
+};
+
+struct corner_diff
+{
+    glm::ivec2    pos;
+    bool          added;
+    std::set<i32> values;
+};
+
+using diff = std::variant<digit_diff, corner_diff, centre_diff>;
 
 struct edit_event
 {
