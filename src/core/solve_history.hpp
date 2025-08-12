@@ -6,9 +6,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
-#include <glm/gtx/hash.hpp>
 
 namespace sudoku {
 
@@ -27,23 +25,8 @@ struct diff
     std::optional<i32> new_value;
 };
 
-struct value_change
-{
-    // Digit change
-    bool changed = false;
-    std::optional<i32> from;
-    std::optional<i32> to;
-
-    std::unordered_set<i32> corner_marks_added;
-    std::unordered_set<i32> corner_marks_removed;
-
-    std::unordered_set<i32> centre_marks_added;
-    std::unordered_set<i32> centre_marks_removed;
-};
-
 struct edit_event
 {
-    //std::unordered_map<glm::ivec2, value_change> changes;
     std::vector<diff> diffs;
 };
 
