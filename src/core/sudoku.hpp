@@ -40,20 +40,24 @@ public:
     sudoku_board(u64 size);
 
     auto at(glm::ivec2 pos) const -> const sudoku_cell&;
+
     auto select(glm::ivec2 pos, bool value) -> void;
     auto toggle_selected(glm::ivec2 pos) -> void;
+    void unselect_all();
 
-    auto set_digit(i32 value) -> void;
-    auto set_corner_pencil_mark(i32 value) -> void;
-    auto set_centre_pencil_mark(i32 value) -> void;    
+    void set_digit(i32 value);
+    void set_corner_pencil_mark(i32 value, bool add);
+    void set_centre_pencil_mark(i32 value, bool add);  
+    
+    void clear_digits();
+    void clear_corner_pencil_marks();
+    void clear_centre_pencil_marks();
 
     auto size() const -> u64;
 
     auto valid(glm::ivec2 pos) -> bool;
 
-    auto clear_selected() -> void;
 
-    auto cells() -> std::vector<sudoku_cell>&;
     auto cells() const -> const std::vector<sudoku_cell>&;
     
     static auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board;
