@@ -6,7 +6,6 @@
 #include "ui.hpp"
 #include "sudoku.hpp"
 #include "draw_board.hpp"
-#include "solve_history.hpp"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -115,36 +114,6 @@ void flip(std::set<i32>& ints, i32 value)
     }
 }
 
-auto has_any_value(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (cell.value.has_value()) return true;
-        }
-    }
-    return false;
-}
-
-auto has_any_centre_pencil_marks(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.centre_pencil_marks.empty()) return true;
-        }
-    }
-    return false;
-}
-
-auto has_any_corner_pencil_marks(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.corner_pencil_marks.empty()) return true;
-        }
-    }
-    return false;
-}
-
 }
 
 auto scene_main_menu(sudoku::window& window) -> next_state
@@ -208,7 +177,6 @@ auto scene_game(sudoku::window& window) -> next_state
     auto timer    = sudoku::timer{};
     auto renderer = sudoku::renderer{};
     auto ui       = sudoku::ui_engine{&renderer};
-    auto history  = sudoku::solve_history{};
 
     auto state = board_render_state{ normal_rs{} };
 
@@ -339,13 +307,7 @@ auto scene_game(sudoku::window& window) -> next_state
                 std::optional<i32> value = {};
                 switch (e->key) {
                     case keyboard::backspace: {
-                        if (has_any_value(board)) {
-                            board.clear_digits();
-                        } else if (has_any_centre_pencil_marks(board)) {
-                            board.clear_centre_pencil_marks();
-                        } else if (has_any_corner_pencil_marks(board)) {
-                            board.clear_corner_pencil_marks();
-                        }
+                        board.clear_selected();
                     } break;
                     case keyboard::escape: {
                         board.unselect_all();

@@ -92,31 +92,71 @@ auto sudoku_board::set_centre_pencil_mark(i32 value) -> void
     }
 }
 
-void sudoku_board::clear_corner_pencil_marks()
+namespace { // TODO: Merge all this logic together
+
+auto has_any_value(const sudoku_board& board) -> bool
 {
-    for (auto& cell : d_cells) {
+    for (auto& cell : board.cells()) {
         if (cell.selected && !cell.fixed) {
-            cell.corner_pencil_marks.clear();
+            if (cell.value.has_value()) return true;
+        }
+    }
+    return false;
+}
+
+auto has_any_centre_pencil_marks(const sudoku_board& board) -> bool
+{
+    for (auto& cell : board.cells()) {
+        if (cell.selected && !cell.fixed) {
+            if (!cell.centre_pencil_marks.empty()) return true;
+        }
+    }
+    return false;
+}
+
+auto has_any_corner_pencil_marks(const sudoku_board& board) -> bool
+{
+    for (auto& cell : board.cells()) {
+        if (cell.selected && !cell.fixed) {
+            if (!cell.corner_pencil_marks.empty()) return true;
+        }
+    }
+    return false;
+}
+
+}
+
+void sudoku_board::clear_selected()
+{
+    if (has_any_value(*this)) {
+        for (auto& cell : d_cells) {
+            if (cell.selected && !cell.fixed) {
+                cell.value = {};
+            }
+        }
+    } else if (has_any_centre_pencil_marks(*this)) {
+        for (auto& cell : d_cells) {
+            if (cell.selected && !cell.fixed) {
+                cell.centre_pencil_marks.clear();
+            }
+        }
+    } else if (has_any_corner_pencil_marks(*this)) {
+        for (auto& cell : d_cells) {
+            if (cell.selected && !cell.fixed) {
+                cell.corner_pencil_marks.clear();
+            }
         }
     }
 }
 
-void sudoku_board::clear_centre_pencil_marks()
+void sudoku_board::undo()
 {
-    for (auto& cell : d_cells) {
-        if (cell.selected && !cell.fixed) {
-            cell.centre_pencil_marks.clear();
-        }
-    }
+
 }
 
-void sudoku_board::clear_digits()
+void sudoku_board::redo()
 {
-    for (auto& cell : d_cells) {
-        if (cell.selected && !cell.fixed) {
-            cell.value = {};
-        }
-    }
+
 }
 
 auto sudoku_board::size() const -> u64
