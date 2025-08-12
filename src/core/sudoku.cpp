@@ -92,60 +92,54 @@ auto sudoku_board::set_centre_pencil_mark(i32 value) -> void
     }
 }
 
-namespace { // TODO: Merge all this logic together
+namespace {
 
-auto has_any_value(const sudoku_board& board) -> bool
+enum class delete_kind
 {
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (cell.value.has_value()) return true;
-        }
-    }
-    return false;
-}
-
-auto has_any_centre_pencil_marks(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.centre_pencil_marks.empty()) return true;
-        }
-    }
-    return false;
-}
-
-auto has_any_corner_pencil_marks(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.corner_pencil_marks.empty()) return true;
-        }
-    }
-    return false;
-}
+    none,
+    digit,
+    centre,
+    corner,
+};
 
 }
 
 void sudoku_board::clear_selected()
 {
-    if (has_any_value(*this)) {
+    const auto find_deletion_kind = [&] {
         for (auto& cell : d_cells) {
             if (cell.selected && !cell.fixed) {
-                cell.value = {};
+                if (cell.value.has_value()) return delete_kind::digit;
+                if (!cell.centre_pencil_marks.empty()) return delete_kind::centre;
+                if (!cell.corner_pencil_marks.empty()) return delete_kind::corner;
             }
         }
-    } else if (has_any_centre_pencil_marks(*this)) {
-        for (auto& cell : d_cells) {
-            if (cell.selected && !cell.fixed) {
-                cell.centre_pencil_marks.clear();
+        return delete_kind::none;
+    };
+
+    switch (find_deletion_kind()) {
+        case delete_kind::digit: {
+            for (auto& cell : d_cells) {
+                if (cell.selected && !cell.fixed) {
+                    cell.value = {};
+                }
             }
-        }
-    } else if (has_any_corner_pencil_marks(*this)) {
-        for (auto& cell : d_cells) {
-            if (cell.selected && !cell.fixed) {
-                cell.corner_pencil_marks.clear();
+        } break;
+        case delete_kind::centre: {
+            for (auto& cell : d_cells) {
+                if (cell.selected && !cell.fixed) {
+                    cell.centre_pencil_marks.clear();
+                }
             }
-        }
+        } break;
+        case delete_kind::corner: {
+            for (auto& cell : d_cells) {
+                if (cell.selected && !cell.fixed) {
+                    cell.corner_pencil_marks.clear();
+                }
+            }
+        } break;
+        case delete_kind::none: {} break;
     }
 }
 
