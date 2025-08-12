@@ -125,7 +125,7 @@ auto draw_digits(renderer& r, const sudoku_board& board, const board_render_stat
                 auto scale = 6;
                 if (auto inner = std::get_if<solved_rs>(&state)) {
                     const auto dt = std::chrono::duration<double>(config.now - inner->time).count();
-                    colour = lerp(colour, from_hex(0x2ecc71), solved_ease(dt, 0.1f * float(x + y)));
+                    colour = lerp(colour, from_hex(0xff9ff3), solved_ease(dt, 0.1f * float(x + y)));
                 }
                 r.push_text_box(std::format("{}", *cell.value), cell_top_left, config.cell_size, config.cell_size, scale, colour);
                 continue; // only render the main digit if it's given
