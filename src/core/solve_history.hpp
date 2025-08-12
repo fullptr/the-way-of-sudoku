@@ -12,31 +12,29 @@ namespace sudoku {
 
 struct digit_diff
 {
-    glm::ivec2 pos;
     std::optional<i32> old_value;
     std::optional<i32> new_value;
 };
 
 struct centre_diff
 {
-    glm::ivec2    pos;
     bool          added;
     std::set<i32> values;
 };
 
 struct corner_diff
 {
-    glm::ivec2    pos;
     bool          added;
     std::set<i32> values;
 };
 
-using diff = std::variant<digit_diff, corner_diff, centre_diff>;
-
-struct edit_event
+struct diff
 {
-    std::vector<diff> diffs;
+    glm::ivec2                                         pos;
+    std::variant<digit_diff, corner_diff, centre_diff> data;
 };
+
+using edit_event = std::vector<diff>;
 
 class solve_history
 {

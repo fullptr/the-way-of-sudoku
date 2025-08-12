@@ -105,15 +105,6 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     return solved_rs{ .time = time };
 }
 
-void flip(std::set<i32>& ints, i32 value)
-{
-    if (ints.contains(value)) {
-        ints.erase(value);
-    } else {
-        ints.insert(value);
-    }
-}
-
 }
 
 auto scene_main_menu(sudoku::window& window) -> next_state
