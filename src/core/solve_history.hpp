@@ -12,6 +12,21 @@
 
 namespace sudoku {
 
+enum class diff_kind
+{
+    digit,
+    centre,
+    corner,
+};
+
+struct diff
+{
+    glm::ivec2         pos;
+    diff_kind          kind;
+    std::optional<i32> old_value;
+    std::optional<i32> new_value;
+};
+
 struct value_change
 {
     // Digit change
@@ -28,7 +43,8 @@ struct value_change
 
 struct edit_event
 {
-    std::unordered_map<glm::ivec2, value_change> changes;
+    //std::unordered_map<glm::ivec2, value_change> changes;
+    std::vector<diff> diffs;
 };
 
 class solve_history
