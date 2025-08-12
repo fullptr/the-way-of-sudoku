@@ -12,6 +12,9 @@ void solve_history::add_event(const edit_event& event)
         d_events.resize(d_curr); // if we've gone back and then made an edit, remove all forward history
     }
     d_events.push_back(event);
+    if (d_events.size() > 1024) { // only keep the last 1024 history
+        d_events.pop_front();
+    }
     d_curr = d_events.size();
 }
 

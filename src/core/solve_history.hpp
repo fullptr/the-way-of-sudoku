@@ -2,6 +2,7 @@
 #include "common.hpp"
 
 #include <vector>
+#include <deque>
 #include <optional>
 #include <set>
 #include <variant>
@@ -38,8 +39,8 @@ using edit_event = std::vector<diff>;
 
 class solve_history
 {
-    std::vector<edit_event> d_events;
-    std::size_t             d_curr;
+    std::deque<edit_event> d_events;
+    std::size_t            d_curr;
 
 public:
     solve_history() = default;
