@@ -1,12 +1,17 @@
 #include "solve_history.hpp"
 
+#include <print>
+
 namespace sudoku {
 
 void solve_history::add_event(const edit_event& event)
 {
-    d_events.resize(d_curr); // if we've gone back and then made an edit, remove all forward history
+    if (d_curr < d_events.size()) {
+        d_events.resize(d_curr); // if we've gone back and then made an edit, remove all forward history
+    }
     d_events.push_back(event);
     d_curr = d_events.size();
+    std::print("added event!\n");
 }
 
 auto solve_history::go_back() -> std::optional<edit_event>

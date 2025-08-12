@@ -1,6 +1,9 @@
 #pragma once
+#include "common.hpp"
+
 #include <vector>
 #include <optional>
+#include <unordered_map>
 #include <unordered_set>
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -9,18 +12,23 @@
 
 namespace sudoku {
 
-enum class edit_type
+struct value_change
 {
-    digit,
-    corner_pencil_mark,
-    centre_pencil_mark,
+    // Digit change
+    bool changed = false;
+    std::optional<i32> from;
+    std::optional<i32> to;
+
+    std::unordered_set<i32> corner_marks_added;
+    std::unordered_set<i32> corner_marks_removed;
+
+    std::unordered_set<i32> centre_marks_added;
+    std::unordered_set<i32> centre_marks_removed;
 };
 
 struct edit_event
 {
-    edit_type                      type;
-    bool                           added;
-    std::unordered_set<glm::ivec2> positions;  
+    std::unordered_map<glm::ivec2, value_change> changes;
 };
 
 class solve_history

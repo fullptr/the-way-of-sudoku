@@ -37,6 +37,7 @@ class sudoku_board
     solve_history            d_history;
 
     auto get(glm::ivec2 pos) -> sudoku_cell&;
+    auto for_each_selected(const std::function<void(int, int, sudoku_cell&)>& fn); // TODO: Replace with function_ref
 
 public:
     sudoku_board(u64 size);
@@ -63,12 +64,11 @@ public:
     void redo();
 
     auto size() const -> u64;
-    auto valid(glm::ivec2 pos) -> bool;
+    auto valid(glm::ivec2 pos) const -> bool;
 
     auto cells() const -> const std::vector<sudoku_cell>&;
     
     static auto make_board(std::vector<std::string_view> cells, std::vector<std::string_view> regions) -> sudoku_board;
 };
-
 
 }
