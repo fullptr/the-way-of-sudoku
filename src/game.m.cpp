@@ -102,6 +102,13 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
         if (seen.size() != board.size()) return constraint_faiure_rs{};
     }
 
+    // check constraints
+    for (const auto& c : board.constraints) {
+        if (!c->check(board)) {
+            return constraint_faiure_rs{};
+        }
+    }
+
     return solved_rs{ .time = time };
 }
 
@@ -246,6 +253,7 @@ auto scene_game(sudoku::window& window) -> next_state
             "3344"
         }
     );
+    board.constraints.emplace_back(std::make_shared<renban>(std::vector<glm::ivec2>{{0, 0}, {1, 0}, {1, 1}}));
 #endif
 
     std::optional<bool> mouse_down = {};

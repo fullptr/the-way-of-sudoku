@@ -1,5 +1,7 @@
 #include "sudoku.hpp"
-#include "renderer.hpp"
+#include "utility.hpp"
+
+#include <print>
 
 namespace sudoku {
 
@@ -192,7 +194,7 @@ void sudoku_board::clear_selected()
             for_each_selected([&](int x, int y, sudoku_cell& cell) {
                 event.emplace_back(diff{
                     .pos = {x, y},
-                    .data = corner_diff{ .added = false, .values = cell.centre_pencil_marks }
+                    .data = corner_diff{ .added = false, .values = cell.corner_pencil_marks }
                 });
                 cell.corner_pencil_marks.clear();
             });
