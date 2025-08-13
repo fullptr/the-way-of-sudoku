@@ -102,6 +102,13 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
         if (seen.size() != board.size()) return constraint_faiure_rs{};
     }
 
+    // check constraints
+    for (const auto& c : board.constraints) {
+        if (!c->check(board)) {
+            return constraint_faiure_rs{};
+        }
+    }
+
     return solved_rs{ .time = time };
 }
 
