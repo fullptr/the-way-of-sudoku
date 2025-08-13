@@ -53,15 +53,6 @@ auto hovered_cell_pos(const sudoku_board& board, const window& w) -> std::option
     return {};
 }
 
-auto hovered_cell(sudoku_board& board, const window& w) -> sudoku_cell*
-{
-    const auto pos = hovered_cell_pos(board, w);
-    if (pos.has_value()) {
-        return &board.at(pos->x, pos->y);
-    }
-    return nullptr;
-}
-
 auto check_solution(const sudoku_board& board, time_point time) -> board_render_state
 {
     auto empty_cells = empty_cells_rs{};
@@ -70,7 +61,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     // check for empty cells
     for (i32 row = 0; row != board.size(); ++row) {
         for (i32 col = 0; col != board.size(); ++col) {
-            const auto val = board.at(row, col).value;
+            const auto val = board.at({row, col}).value;
             if (!val.has_value()) empty_cells.cells.insert(glm::ivec2{row, col});
         }
     }
@@ -82,7 +73,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     for (i32 row = 0; row != board.size(); ++row) {
         std::unordered_set<i32> seen; 
         for (i32 col = 0; col != board.size(); ++col) {
-            const auto val = board.at(row, col).value;
+            const auto val = board.at({row, col}).value;
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return constraint_faiure_rs{}; // duplicate values in the row
@@ -92,7 +83,7 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     for (i32 col = 0; col != board.size(); ++col) {
         std::unordered_set<i32> seen; 
         for (i32 row = 0; row != board.size(); ++row) {
-            const auto val = board.at(row, col).value;
+            const auto val = board.at({row, col}).value;
             seen.insert(*val);
         }
         if (seen.size() != board.size()) return constraint_faiure_rs{}; // duplicate values in the row
@@ -102,8 +93,8 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     std::unordered_map<i32, std::unordered_set<i32>> regions;
     for (i32 row = 0; row != board.size(); ++row) {
         for (i32 col = 0; col != board.size(); ++col) {
-            if (board.at(row, col).region.has_value()) {
-                regions[*board.at(row,col).region].insert(*board.at(row, col).value);
+            if (board.at({row, col}).region.has_value()) {
+                regions[*board.at({row, col}).region].insert(*board.at({row, col}).value);
             }
         }
     }
@@ -112,131 +103,6 @@ auto check_solution(const sudoku_board& board, time_point time) -> board_render_
     }
 
     return solved_rs{ .time = time };
-}
-
-void flip(std::set<i32>& ints, i32 value)
-{
-    if (ints.contains(value)) {
-        ints.erase(value);
-    } else {
-        ints.insert(value);
-    }
-}
-
-void update_centre_pencil_mark(sudoku_board& board, i32 value)
-{
-    // If any of the cells can accept the pencil mark, we are adding, otherwise
-    // we are removing
-    bool add = false;
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.centre_pencil_marks.contains(value)) {
-                add = true;
-                break;
-            }
-        }
-    }
-
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (add) {
-                cell.centre_pencil_marks.insert(value);
-            } else {
-                cell.centre_pencil_marks.erase(value);
-            }
-        }
-    }
-}
-
-void clear_centre_pencil_mark(sudoku_board& board)
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            cell.centre_pencil_marks.clear();
-        }
-    }
-}
-
-void update_corner_pencil_mark(sudoku_board& board, i32 value)
-{
-    // If any of the cells can accept the pencil mark, we are adding, otherwise
-    // we are removing
-    bool add = false;
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.corner_pencil_marks.contains(value)) {
-                add = true;
-                break;
-            }
-        }
-    }
-
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (add) {
-                cell.corner_pencil_marks.insert(value);
-            } else {
-                cell.corner_pencil_marks.erase(value);
-            }
-        }
-    }
-}
-
-void clear_corner_pencil_mark(sudoku_board& board)
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            cell.corner_pencil_marks.clear();
-        }
-    }
-}
-
-void set_value(sudoku_board& board, i32 value)
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            cell.value = value;
-        }
-    }
-}
-
-void remove_value(sudoku_board& board)
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            cell.value = {};
-        }
-    }
-}
-
-auto has_any_value(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (cell.value.has_value()) return true;
-        }
-    }
-    return false;
-}
-
-auto has_any_centre_pencil_marks(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.centre_pencil_marks.empty()) return true;
-        }
-    }
-    return false;
-}
-
-auto has_any_corner_pencil_marks(const sudoku_board& board) -> bool
-{
-    for (auto& cell : board.cells()) {
-        if (cell.selected && !cell.fixed) {
-            if (!cell.corner_pencil_marks.empty()) return true;
-        }
-    }
-    return false;
 }
 
 }
@@ -307,7 +173,7 @@ auto scene_game(sudoku::window& window) -> next_state
 
 #define LEVEL 3
 #if LEVEL == 0
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             "2..91.568",
             "...2541..",
@@ -331,7 +197,7 @@ auto scene_game(sudoku::window& window) -> next_state
         }
     );
 #elif LEVEL == 1
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             "..57341",
             "54..217",
@@ -351,7 +217,7 @@ auto scene_game(sudoku::window& window) -> next_state
         }
     );
 #elif LEVEL == 2
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             ".5...",
             "...3.",
@@ -367,7 +233,7 @@ auto scene_game(sudoku::window& window) -> next_state
         }
     );
 #elif LEVEL == 3
-    auto board = make_board(
+    auto board = sudoku_board::make_board(
         {
             "..12",
             "..3.",
@@ -399,49 +265,53 @@ auto scene_game(sudoku::window& window) -> next_state
                 continue; // Don't allow updating the board when it's solved
             }
 
-            if (auto e = event.get_if<mouse_pressed_event>()) {
-                auto cell = hovered_cell(board, window);
-                if (cell != nullptr) {
+            if (const auto e = event.get_if<mouse_pressed_event>()) {
+                const auto pos = hovered_cell_pos(board, window);
+                if (pos.has_value() && board.valid(*pos)) {
                     if (e->button == mouse::left) {
                         if (e->mods & modifier::shift) {
-                            cell->selected = !cell->selected;
+                            board.toggle_selected(*pos);
                         } else {
-                            board.clear_selected();
-                            cell->selected = true;
+                            board.unselect_all();
+                            board.select(*pos, true);
                         }
-                        mouse_down = cell->selected;
+                        mouse_down = std::as_const(board).at(*pos).selected;
                     }
                 } else {
-                    board.clear_selected();
+                    board.unselect_all();
                 }
             }
-            else if (auto e = event.get_if<mouse_released_event>()) {
+            else if (const auto e = event.get_if<mouse_released_event>()) {
                 if (e->button == mouse::left) {
                     mouse_down = {};
                 }
             }
-            else if (auto e = event.get_if<mouse_moved_event>()) {
+            else if (const auto e = event.get_if<mouse_moved_event>()) {
                 if (mouse_down.has_value()) {
-                    auto cell = hovered_cell(board, window);
-                    if (cell != nullptr) {
-                        cell->selected = *mouse_down;
+                    auto cell = hovered_cell_pos(board, window);
+                    if (cell.has_value() && board.valid(*cell)) {
+                        board.select(*cell, *mouse_down);
                     }
                 }
             }
-            else if (auto e = event.get_if<keyboard_pressed_event>()) {
+            else if (const auto e = event.get_if<keyboard_pressed_event>()) {
                 std::optional<i32> value = {};
                 switch (e->key) {
-                    case keyboard::backspace: {
-                        if (has_any_value(board)) {
-                            remove_value(board);
-                        } else if (has_any_centre_pencil_marks(board)) {
-                            clear_centre_pencil_mark(board);
-                        } else if (has_any_corner_pencil_marks(board)) {
-                            clear_corner_pencil_mark(board);
+                    case keyboard::Z: {
+                        if (e->mods & modifier::ctrl) {
+                            board.undo();
                         }
                     } break;
-                    case keyboard::escape: {
+                    case keyboard::Y: {
+                        if (e->mods & modifier::ctrl) {
+                            board.redo();
+                        }
+                    } break;
+                    case keyboard::backspace: {
                         board.clear_selected();
+                    } break;
+                    case keyboard::escape: {
+                        board.unselect_all();
                     } break;
                     case keyboard::num_1: value = 1; break;
                     case keyboard::num_2: value = 2; break;
@@ -457,13 +327,27 @@ auto scene_game(sudoku::window& window) -> next_state
                 if (*value > board.size()) continue; // not a digit in the grid
 
                 if (e->mods & modifier::ctrl) {
-                    update_centre_pencil_mark(board, *value);
+                    board.set_centre_pencil_mark(*value);
                 }
                 else if (e->mods & modifier::shift) {
-                    update_corner_pencil_mark(board, *value);
+                    board.set_corner_pencil_mark(*value);
                 }
                 else {
-                    set_value(board, *value);
+                    board.set_digit(*value);
+                }
+            }
+            else if (auto e = event.get_if<keyboard_held_event>()) {
+                switch (e->key) {
+                    case keyboard::Z: {
+                        if (e->mods & modifier::ctrl) {
+                            board.undo();
+                        }
+                    } break;
+                    case keyboard::Y: {
+                        if (e->mods & modifier::ctrl) {
+                            board.redo();
+                        }
+                    } break;
                 }
             }
         }
