@@ -253,7 +253,7 @@ auto scene_game(sudoku::window& window) -> next_state
             "3344"
         }
     );
-    board.constraints.emplace_back(std::make_shared<renban>(std::vector<glm::ivec2>{{0, 0}, {1, 0}, {1, 1}}));
+    board.constraints.emplace_back(std::make_shared<german_whisper>(std::vector<glm::ivec2>{{0, 0}, {1, 0}, {1, 1}}));
 #endif
 
     std::optional<bool> mouse_down = {};

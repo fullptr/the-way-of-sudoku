@@ -26,4 +26,14 @@ public:
     auto draw(renderer& r, const render_config& config) const -> void override;
 };
 
+class german_whisper : public constraint
+{
+    std::vector<glm::ivec2> d_positions;
+
+public:
+    german_whisper(const std::vector<glm::ivec2>& positions) : d_positions{positions} {}
+    auto check(const sudoku_board& board) const -> bool override;
+    auto draw(renderer& r, const render_config& config) const -> void override;
+};
+
 }
