@@ -36,9 +36,9 @@ auto renban::draw(renderer& r, const render_config& config) const -> void
         auto a_pos = d_positions[i];
         auto b_pos = d_positions[i + 1];
 
-        const auto a = config.tl + config.cell_size * glm::vec2{a_pos.x + 1, a_pos.y};
-        const auto b = config.tl + config.cell_size * glm::vec2{a_pos.x + 1, a_pos.y + 1};
-        r.push_line(a, b, from_hex(0xe84393), 1.f);
+        const auto a = config.tl + config.cell_size * glm::vec2{a_pos.x + 0.5f, a_pos.y + 0.5f};
+        const auto b = config.tl + config.cell_size * glm::vec2{b_pos.x + 0.5f, b_pos.y + 0.5f};
+        r.push_line(a, b, from_hex(0xe84393), 4.0f);
     }
 }
 

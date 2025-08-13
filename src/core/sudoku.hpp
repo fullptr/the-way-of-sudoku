@@ -1,6 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "solve_history.hpp"
+#include "constraints.hpp"
 
 #include <optional>
 #include <vector>
@@ -42,6 +43,8 @@ class sudoku_board
     auto for_each_selected(const std::function<void(int, int, sudoku_cell&)>& fn); // TODO: Replace with function_ref
 
 public:
+    std::vector<std::shared_ptr<constraint>> constraints; // TODO - make private
+
     sudoku_board(u64 size);
 
     auto at(glm::ivec2 pos) const -> const sudoku_cell&;

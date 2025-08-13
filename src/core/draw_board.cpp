@@ -73,11 +73,6 @@ auto draw_constraints(renderer& r, const sudoku_board& board, const board_render
             }
         }
     }
-
-    // draw the renbans (and others...)
-    //for (const auto& c : board.constraints()) {
-    //    c->draw(r, config);
-    //}
 }
 
 // draw border
@@ -173,6 +168,14 @@ void draw_board(
     draw_highlighted(r, board, config);
     draw_constraints(r, board, state, config);
     draw_border(r, config);
+
+    // draw the renbans (and others...)
+    for (const auto& c : board.constraints) {
+        c->draw(r, config);
+    }
+
+    r.draw(screen_dimensions.x, screen_dimensions.y);
+
     draw_digits(r, board, state, config);
 }
 

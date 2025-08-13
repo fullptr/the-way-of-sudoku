@@ -7,6 +7,7 @@ namespace sudoku {
 class sudoku_board;
 class renderer;
 class render_config;
+
 class constraint
 {
 public:
