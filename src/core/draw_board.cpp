@@ -11,23 +11,6 @@ constexpr auto colour_added_digits = from_hex(0x1abc9c);
 constexpr auto colour_cell = from_hex(0x2c3e50);
 constexpr auto colour_cell_hightlighted = from_hex(0x34495e);
 
-struct render_config
-{
-    glm::vec2 screen_dimensions;
-
-    f32       board_size;
-    glm::vec2 board_centre;
-
-    f32 cell_size;
-
-    glm::vec2 tl;
-    glm::vec2 tr;
-    glm::vec2 bl;
-    glm::vec2 br;
-
-    time_point now;
-};
-
 // draw backboard
 auto draw_backboard(renderer& r, const sudoku_board& board, const render_config& config)
 {
@@ -90,6 +73,11 @@ auto draw_constraints(renderer& r, const sudoku_board& board, const board_render
             }
         }
     }
+
+    // draw the renbans (and others...)
+    //for (const auto& c : board.constraints()) {
+    //    c->draw(r, config);
+    //}
 }
 
 // draw border

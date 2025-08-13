@@ -1,5 +1,7 @@
 #include "sudoku.hpp"
-#include "renderer.hpp"
+#include "utility.hpp"
+
+#include <print>
 
 namespace sudoku {
 

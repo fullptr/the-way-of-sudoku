@@ -5,8 +5,10 @@
 #include <optional>
 #include <vector>
 #include <unordered_set>
-#include <print>
 #include <set>
+#include <span>
+#include <memory>
+#include <string_view>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
@@ -32,9 +34,9 @@ struct sudoku_region
 
 class sudoku_board
 {
-    u64                      d_size;
-    std::vector<sudoku_cell> d_cells;
-    solve_history            d_history;
+    u64                                      d_size;
+    std::vector<sudoku_cell>                 d_cells;
+    solve_history                            d_history;
 
     auto get(glm::ivec2 pos) -> sudoku_cell&;
     auto for_each_selected(const std::function<void(int, int, sudoku_cell&)>& fn); // TODO: Replace with function_ref

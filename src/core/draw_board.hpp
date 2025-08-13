@@ -8,6 +8,23 @@
 
 namespace sudoku {
 
+struct render_config
+{
+    glm::vec2 screen_dimensions;
+
+    f32       board_size;
+    glm::vec2 board_centre;
+
+    f32 cell_size;
+
+    glm::vec2 tl;
+    glm::vec2 tr;
+    glm::vec2 bl;
+    glm::vec2 br;
+
+    time_point now;
+};
+
 // Regular state, still being solved
 struct normal_rs
 {
