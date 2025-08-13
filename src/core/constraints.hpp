@@ -16,7 +16,6 @@ public:
     virtual ~constraint() = default;
 };
 
-// TODO: Move to separate header
 class renban : public constraint
 {
     std::vector<glm::ivec2> d_positions;
